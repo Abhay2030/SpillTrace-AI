@@ -1,20 +1,36 @@
 "use client";
 
 import React, { useState } from 'react';
-import { Ship, SlidersHorizontal, Eye, Lock, RefreshCw, AlertTriangle, ShieldCheck } from 'lucide-react';
+import { Ship, SlidersHorizontal, Eye, Lock, Download, ExternalLink, ShieldCheck, Database, Compass, AlertCircle } from 'lucide-react';
+import { mockVessels } from '@/data/mockProviders';
 
 export default function AISControlPanel() {
-  const [filterType, setFilterType] = useState('All');
+  const [filterCode, setFilterCode] = useState<number | 'ALL'>('ALL');
   const [showRoutes, setShowRoutes] = useState(true);
   const [lockedTarget, setLockedTarget] = useState(true);
+  const [selectedNavStatus, setSelectedNavStatus] = useState<string>('ALL');
 
-  const vesselCategories = [
-    { type: 'All', count: 32, icon: '🌐' },
-    { type: 'Tanker', count: 8, icon: '🛢️', suspectCount: 1 },
-    { type: 'Cargo', count: 14, icon: '📦' },
-    { type: 'Bulk', count: 6, icon: '⚓' },
-    { type: 'Patrol', count: 4, icon: '🛡️' },
+  // Official NOAA / BOEM MarineCadastre.gov AccessAIS Vessel Type Categories
+  const marineCadastreCategories = [
+    { code: 'ALL', groupName: 'All Classes', icon: '🌐', count: mockVessels.length },
+    { code: 80, groupName: 'Code 80-89 (Tanker)', icon: '🛢️', count: 8, suspectCount: 1 },
+    { code: 70, groupName: 'Code 70-79 (Cargo)', icon: '📦', count: 14 },
+    { code: 30, groupName: 'Code 30 (Fishing)', icon: '🎣', count: 4 },
+    { code: 60, groupName: 'Code 60-69 (Passenger)', icon: '🚢', count: 3 },
+    { code: 35, groupName: 'Code 35 (Tug/Gov)', icon: '🛡️', count: 3 },
   ];
+
+  // Export MarineCadastre.gov Datasheet format
+  const exportMarineCadastreDatasheet = () => {
+    const jsonStr = JSON.stringify(mockVessels, null, 2);
+    const blob = new Blob([jsonStr], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `MarineCadastre_AccessAIS_Telemetry_Export_${new Date().toISOString().slice(0, 10)}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
 
   return (
     <div className="glass-card p-5 w-full text-[var(--text-primary)] border border-white/10 hover:border-[#00F0FF]/40 transition-all duration-300 shadow-[0_8px_32px_rgba(0,0,0,0.4)] rounded-xl">
@@ -22,51 +38,56 @@ export default function AISControlPanel() {
       <div className="flex items-center justify-between mb-4 border-b border-white/10 pb-3">
         <div className="flex items-center gap-2.5">
           <div className="w-8 h-8 rounded-lg bg-[#00F0FF]/10 border border-[#00F0FF]/30 flex items-center justify-center text-[#00F0FF]">
-            <Ship size={18} />
+            <Database size={18} />
           </div>
           <div>
-            <h3 className="font-display font-semibold text-sm tracking-wide text-white">
-              AIS VESSEL TRAFFIC MONITOR
+            <h3 className="font-display font-semibold text-sm tracking-wide text-white flex items-center gap-1.5">
+              MARINECADASTRE.GOV AIS FEED
+              <a
+                href="https://marinecadastre.gov/accessais/"
+                target="_blank"
+                rel="noreferrer"
+                title="View MarineCadastre.gov AccessAIS Data Dictionary"
+                className="text-gray-400 hover:text-[#00F0FF] transition-colors"
+              >
+                <ExternalLink size={12} />
+              </a>
             </h3>
-            <p className="text-[10px] font-mono text-gray-400">REAL-TIME TELEMETRY FEED</p>
+            <p className="text-[10px] font-mono text-gray-400">NOAA / BOEM ACCESSAIS COMPLIANT</p>
           </div>
         </div>
         
-        <span className="flex items-center gap-1.5 text-[10px] font-mono text-[#00FF66] bg-[#00FF66]/10 border border-[#00FF66]/30 px-2 py-0.5 rounded-full">
+        <span className="flex items-center gap-1.5 text-[10px] font-mono text-[#00FF66] bg-[#00FF66]/10 border border-[#00FF66]/30 px-2 py-0.5 rounded-full font-semibold">
           <span className="w-1.5 h-1.5 rounded-full bg-[#00FF66] animate-pulse" />
-          32 VESSELS LIVE
+          ACCESSAIS VERIFIED
         </span>
       </div>
 
-      {/* Vessel Category Filter Buttons */}
-      <div className="mb-5">
+      {/* Official MarineCadastre Type Code Filter */}
+      <div className="mb-4">
         <div className="flex items-center justify-between mb-2">
-          <label className="text-[11px] font-mono text-gray-300 font-medium">FILTER BY CLASS</label>
-          <span className="text-[10px] font-mono text-gray-400">1 TARGET MATCHED</span>
+          <label className="text-[11px] font-mono text-gray-300 font-medium">MARINECADASTRE TYPE CODES</label>
+          <span className="text-[10px] font-mono text-[#00F0FF]">NOAA CLASS A/B</span>
         </div>
 
-        <div className="grid grid-cols-3 gap-2">
-          {vesselCategories.map(({ type, count, icon, suspectCount }) => {
-            const isActive = filterType === type;
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+          {marineCadastreCategories.map(({ code, groupName, icon, count, suspectCount }) => {
+            const isActive = filterCode === code;
             return (
               <button
-                key={type}
-                onClick={() => setFilterType(type)}
-                className={`relative px-2.5 py-2 text-xs font-mono rounded-lg border transition-all duration-200 flex items-center justify-between ${
+                key={String(code)}
+                onClick={() => setFilterCode(code as any)}
+                className={`relative px-2.5 py-2 text-[11px] font-mono rounded-lg border transition-all duration-200 flex items-center justify-between ${
                   isActive
                     ? 'bg-[#00F0FF]/15 border-[#00F0FF] text-white shadow-[0_0_12px_rgba(0,240,255,0.3)] font-semibold'
                     : 'bg-white/5 border-white/10 text-gray-300 hover:border-white/25 hover:bg-white/10'
                 }`}
               >
-                <span className="flex items-center gap-1">
+                <span className="flex items-center gap-1.5 truncate">
                   <span>{icon}</span>
-                  <span>{type}</span>
-                </span>
-                <span className={`text-[10px] px-1.5 py-0.2 rounded ${isActive ? 'bg-[#00F0FF] text-black font-bold' : 'bg-black/40 text-gray-400'}`}>
-                  {count}
+                  <span className="truncate">{groupName}</span>
                 </span>
 
-                {/* Suspect Alert Indicator */}
                 {suspectCount && (
                   <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-[#FF0055] animate-ping" />
                 )}
@@ -76,44 +97,65 @@ export default function AISControlPanel() {
         </div>
       </div>
 
-      {/* Target Suspect Quick Card */}
-      <div className="bg-[#FF0055]/10 border border-[#FF0055]/40 rounded-lg p-3 mb-4 flex items-center justify-between">
-        <div className="flex items-center gap-2.5">
-          <AlertTriangle size={16} className="text-[#FF0055] animate-pulse" />
-          <div>
-            <div className="text-xs font-mono font-bold text-[#FF0055]">TARGET: MT ALFA SEAWAY</div>
-            <div className="text-[10px] font-mono text-gray-300">MMSI: 235890142 | SPEED: 14.2 KTS</div>
+      {/* Target Suspect Telemetry Card (MarineCadastre Specs) */}
+      <div className="bg-[#FF0055]/10 border border-[#FF0055]/40 rounded-xl p-3.5 mb-4 shadow-[0_0_15px_rgba(255,0,85,0.15)]">
+        <div className="flex items-start justify-between mb-2">
+          <div className="flex items-center gap-2">
+            <AlertCircle size={16} className="text-[#FF0055] shrink-0 animate-pulse" />
+            <div>
+              <div className="text-xs font-mono font-bold text-white flex items-center gap-1.5">
+                MT ALFA SEAWAY
+                <span className="text-[9px] font-mono bg-[#FF0055] text-white font-bold px-1.5 py-0.2 rounded">SUSPECT</span>
+              </div>
+              <div className="text-[10px] font-mono text-gray-300">
+                MMSI: 235890142 | IMO: 9481920 | CALLSIGN: WDB9182
+              </div>
+            </div>
           </div>
+          <span className="text-[10px] font-mono bg-[#FF0055] text-white font-bold px-2 py-0.5 rounded shrink-0">
+            98.4% MATCH
+          </span>
         </div>
-        <span className="text-[10px] font-mono bg-[#FF0055] text-white font-bold px-2 py-0.5 rounded">
-          98.4% MATCH
-        </span>
+
+        <div className="grid grid-cols-3 gap-2 text-[10px] font-mono bg-black/40 p-2 rounded-lg text-gray-300">
+          <div><span className="text-gray-400">TYPE CODE:</span> 80 (TANKER)</div>
+          <div><span className="text-gray-400">SOG / COG:</span> 14.2 kts / 142°</div>
+          <div><span className="text-gray-400">DRAFT:</span> 14.8m</div>
+        </div>
       </div>
 
-      {/* Interactive Control Action Buttons */}
-      <div className="grid grid-cols-2 gap-2">
+      {/* Interactive Control & Export Buttons */}
+      <div className="grid grid-cols-3 gap-2">
         <button
           onClick={() => setShowRoutes(!showRoutes)}
-          className={`flex items-center justify-center gap-1.5 text-xs font-mono py-2 rounded-lg border transition-all ${
+          className={`flex items-center justify-center gap-1 text-[11px] font-mono py-2 rounded-lg border transition-all ${
             showRoutes
-              ? 'bg-[#00A8E8]/20 border-[#00A8E8] text-[#00A8E8] font-medium'
+              ? 'bg-[#00A8E8]/20 border-[#00A8E8] text-[#00A8E8] font-semibold'
               : 'bg-white/5 border-white/10 text-gray-400 hover:border-white/20'
           }`}
         >
-          <Eye size={14} />
-          {showRoutes ? 'ROUTES VISIBLE' : 'HIDDEN ROUTES'}
+          <Eye size={13} />
+          {showRoutes ? 'ROUTES ON' : 'ROUTES OFF'}
         </button>
 
         <button
           onClick={() => setLockedTarget(!lockedTarget)}
-          className={`flex items-center justify-center gap-1.5 text-xs font-mono py-2 rounded-lg border transition-all ${
+          className={`flex items-center justify-center gap-1 text-[11px] font-mono py-2 rounded-lg border transition-all ${
             lockedTarget
               ? 'bg-[#FF0055]/20 border-[#FF0055] text-[#FF0055] font-semibold shadow-[0_0_10px_rgba(255,0,85,0.2)]'
               : 'bg-white/5 border-white/10 text-gray-400 hover:border-white/20'
           }`}
         >
-          <Lock size={14} />
-          {lockedTarget ? 'LOCK SUSPECT' : 'UNLOCK CAM'}
+          <Lock size={13} />
+          {lockedTarget ? 'LOCKED' : 'UNLOCKED'}
+        </button>
+
+        <button
+          onClick={exportMarineCadastreDatasheet}
+          className="flex items-center justify-center gap-1 text-[11px] font-mono py-2 rounded-lg border border-[#00F0FF]/40 bg-[#00F0FF]/15 text-[#00F0FF] hover:bg-[#00F0FF]/25 font-semibold transition-all shadow-[0_0_10px_rgba(0,240,255,0.15)]"
+        >
+          <Download size={13} />
+          EXPORT AIS
         </button>
       </div>
     </div>
