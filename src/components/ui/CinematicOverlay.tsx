@@ -210,8 +210,8 @@ export default function CinematicOverlay() {
         </section>
         
         {/* ===== CH02: TRACE ===== */}
-        <section className="chapter-panel h-[150vh] flex items-center justify-end text-right px-8 md:px-24">
-          <div className="content pointer-events-auto max-w-2xl flex flex-col items-end">
+        <section className="chapter-panel h-[150vh] flex items-center justify-end text-right px-8 md:px-32 lg:px-48">
+          <div className="content pointer-events-auto max-w-2xl flex flex-col items-end mr-0 md:mr-8 lg:mr-16">
             <div className="flex items-center gap-3 mb-6 bg-black/50 w-max px-4 py-2 rounded-full border border-white/10 backdrop-blur-md">
               <p className="text-xs font-mono text-[#00B4D8] tracking-[0.2em]">02 / TRACE</p>
               <Droplets size={16} className="text-[#00B4D8]" />
@@ -302,8 +302,8 @@ export default function CinematicOverlay() {
         </section>
 
         {/* ===== CH05: EXPLAIN ===== */}
-        <section className="chapter-panel h-[150vh] flex items-center justify-end text-right px-8 md:px-24">
-          <div className="content pointer-events-auto max-w-xl flex flex-col items-end">
+        <section className="chapter-panel h-[150vh] flex items-center justify-end text-right px-8 md:px-32 lg:px-48">
+          <div className="content pointer-events-auto max-w-xl flex flex-col items-end mr-0 md:mr-8 lg:mr-16">
             <div className="flex items-center gap-3 mb-6 bg-black/50 w-max px-4 py-2 rounded-full border border-white/10 backdrop-blur-md">
               <p className="text-xs font-mono text-[#00B4D8] tracking-[0.2em]">05 / EXPLAIN</p>
               <Brain size={16} className="text-[#00B4D8]" />
@@ -399,8 +399,8 @@ export default function CinematicOverlay() {
         </section>
 
         {/* ===== CH08: MONITOR ===== */}
-        <section className="chapter-panel h-[150vh] flex items-center justify-end text-right px-8 md:px-24">
-          <div className="content pointer-events-auto max-w-xl flex flex-col items-end">
+        <section className="chapter-panel h-[150vh] flex items-center justify-end text-right px-8 md:px-32 lg:px-48">
+          <div className="content pointer-events-auto max-w-xl flex flex-col items-end mr-0 md:mr-8 lg:mr-16">
             <div className="flex items-center gap-3 mb-6 bg-black/50 w-max px-4 py-2 rounded-full border border-white/10 backdrop-blur-md">
               <p className="text-xs font-mono text-[#00B4D8] tracking-[0.2em]">08 / MONITOR</p>
               <Radio size={16} className="text-[#00B4D8]" />
