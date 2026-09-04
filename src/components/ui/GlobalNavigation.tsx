@@ -37,7 +37,7 @@ export default function GlobalNavigation() {
       <motion.nav 
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${scrolled ? 'bg-[var(--surface-glass)] backdrop-blur-md py-3 border-b border-[var(--border-subtle)] shadow-[var(--shadow-elegant)]' : 'bg-transparent py-6'}`}
       >
-        <div className="max-w-[1400px] mx-auto px-4 sm:px-8 flex items-center justify-between gap-4">
+        <div className="max-w-[1400px] mx-auto px-6 sm:px-12 md:px-20 lg:px-32 flex items-center justify-between gap-4">
           <Link href="/" className="flex items-center gap-2.5 group shrink-0">
             <div className="relative flex items-center justify-center shrink-0">
               <img 

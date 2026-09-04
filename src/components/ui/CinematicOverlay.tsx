@@ -136,7 +136,7 @@ export default function CinematicOverlay() {
       <div className="relative z-10 text-white">
         
         {/* ===== HERO ===== */}
-        <section className="chapter-panel h-[150vh] flex items-center px-8 md:px-24">
+        <section className="chapter-panel h-[150vh] flex items-center px-8 sm:px-14 md:px-28 lg:px-40">
           <div className="content pointer-events-auto max-w-3xl">
             <div className="flex items-center gap-4 mb-6">
               <img src="/logo.png" alt="SpillTrace AI Logo" className="h-16 md:h-20 w-auto object-contain drop-shadow-[0_0_25px_rgba(0,180,216,0.4)]" />
@@ -182,7 +182,7 @@ export default function CinematicOverlay() {
         </section>
 
         {/* ===== CH01: DETECT ===== */}
-        <section className="chapter-panel h-[150vh] flex items-center px-8 md:px-24">
+        <section className="chapter-panel h-[150vh] flex items-center px-8 sm:px-14 md:px-28 lg:px-40">
           <div className="content pointer-events-auto max-w-2xl">
             <div className="flex items-center gap-3 mb-6 bg-black/50 w-max px-4 py-2 rounded-full border border-white/10 backdrop-blur-md">
               <Satellite size={16} className="text-[#00B4D8]" />
@@ -210,8 +210,8 @@ export default function CinematicOverlay() {
         </section>
         
         {/* ===== CH02: TRACE ===== */}
-        <section className="chapter-panel h-[150vh] flex items-center justify-end text-right px-8 md:px-32 lg:px-48">
-          <div className="content pointer-events-auto max-w-2xl flex flex-col items-end mr-0 md:mr-8 lg:mr-16">
+        <section className="chapter-panel h-[150vh] flex items-center justify-end text-right px-8 sm:px-16 md:px-36 lg:px-56">
+          <div className="content pointer-events-auto max-w-2xl flex flex-col items-end mr-0 md:mr-12 lg:mr-24">
             <div className="flex items-center gap-3 mb-6 bg-black/50 w-max px-4 py-2 rounded-full border border-white/10 backdrop-blur-md">
               <p className="text-xs font-mono text-[#00B4D8] tracking-[0.2em]">02 / TRACE</p>
               <Droplets size={16} className="text-[#00B4D8]" />
@@ -238,7 +238,7 @@ export default function CinematicOverlay() {
         </section>
 
         {/* ===== CH03: CORRELATE ===== */}
-        <section className="chapter-panel h-[150vh] flex items-center px-8 md:px-24">
+        <section className="chapter-panel h-[150vh] flex items-center px-8 sm:px-14 md:px-28 lg:px-40">
           <div className="content pointer-events-auto max-w-2xl">
             <div className="flex items-center gap-3 mb-6 bg-black/50 w-max px-4 py-2 rounded-full border border-white/10 backdrop-blur-md">
               <Ship size={16} className="text-[#00B4D8]" />
@@ -274,7 +274,7 @@ export default function CinematicOverlay() {
         </section>
 
         {/* ===== CH04: ATTRIBUTE ===== */}
-        <section className="chapter-panel h-[150vh] flex items-center justify-center text-center px-8 md:px-24">
+        <section className="chapter-panel h-[150vh] flex items-center justify-center text-center px-8 sm:px-14 md:px-28 lg:px-40">
           <div className="content pointer-events-auto max-w-4xl flex flex-col items-center">
             <div className="flex items-center gap-3 mb-6 bg-black/50 w-max px-4 py-2 rounded-full border border-white/10 backdrop-blur-md">
               <Search size={16} className="text-[#00B4D8]" />
@@ -302,8 +302,8 @@ export default function CinematicOverlay() {
         </section>
 
         {/* ===== CH05: EXPLAIN ===== */}
-        <section className="chapter-panel h-[150vh] flex items-center justify-end text-right px-8 md:px-32 lg:px-48">
-          <div className="content pointer-events-auto max-w-xl flex flex-col items-end mr-0 md:mr-8 lg:mr-16">
+        <section className="chapter-panel h-[150vh] flex items-center justify-end text-right px-8 sm:px-16 md:px-36 lg:px-56">
+          <div className="content pointer-events-auto max-w-xl flex flex-col items-end mr-0 md:mr-12 lg:mr-24">
             <div className="flex items-center gap-3 mb-6 bg-black/50 w-max px-4 py-2 rounded-full border border-white/10 backdrop-blur-md">
               <p className="text-xs font-mono text-[#00B4D8] tracking-[0.2em]">05 / EXPLAIN</p>
               <Brain size={16} className="text-[#00B4D8]" />
@@ -337,7 +337,7 @@ export default function CinematicOverlay() {
         </section>
 
         {/* ===== CH06: ASSESS ===== */}
-        <section className="chapter-panel h-[150vh] flex items-center px-8 md:px-24">
+        <section className="chapter-panel h-[150vh] flex items-center px-8 sm:px-14 md:px-28 lg:px-40">
           <div className="content pointer-events-auto max-w-2xl">
             <div className="flex items-center gap-3 mb-6 bg-black/50 w-max px-4 py-2 rounded-full border border-white/10 backdrop-blur-md">
               <ShieldAlert size={16} className="text-[#E63946]" />
@@ -370,7 +370,7 @@ export default function CinematicOverlay() {
         </section>
 
         {/* ===== CH07: RESPOND ===== */}
-        <section className="chapter-panel h-[150vh] flex items-center justify-center text-center px-8 md:px-24">
+        <section className="chapter-panel h-[150vh] flex items-center justify-center text-center px-8 sm:px-14 md:px-28 lg:px-40">
           <div className="content pointer-events-auto max-w-4xl flex flex-col items-center">
             <div className="flex items-center gap-3 mb-6 bg-black/50 w-max px-4 py-2 rounded-full border border-white/10 backdrop-blur-md">
               <Activity size={16} className="text-[#00B4D8]" />
@@ -399,8 +399,8 @@ export default function CinematicOverlay() {
         </section>
 
         {/* ===== CH08: MONITOR ===== */}
-        <section className="chapter-panel h-[150vh] flex items-center justify-end text-right px-8 md:px-32 lg:px-48">
-          <div className="content pointer-events-auto max-w-xl flex flex-col items-end mr-0 md:mr-8 lg:mr-16">
+        <section className="chapter-panel h-[150vh] flex items-center justify-end text-right px-8 sm:px-16 md:px-36 lg:px-56">
+          <div className="content pointer-events-auto max-w-xl flex flex-col items-end mr-0 md:mr-12 lg:mr-24">
             <div className="flex items-center gap-3 mb-6 bg-black/50 w-max px-4 py-2 rounded-full border border-white/10 backdrop-blur-md">
               <p className="text-xs font-mono text-[#00B4D8] tracking-[0.2em]">08 / MONITOR</p>
               <Radio size={16} className="text-[#00B4D8]" />
@@ -415,7 +415,7 @@ export default function CinematicOverlay() {
         </section>
 
         {/* ===== FINAL HERO ===== */}
-        <section className="chapter-panel h-[150vh] flex items-center justify-center text-center px-8 md:px-24">
+        <section className="chapter-panel h-[150vh] flex items-center justify-center text-center px-8 sm:px-14 md:px-28 lg:px-40">
           <div className="content pointer-events-auto max-w-4xl flex flex-col items-center">
             <p className="text-xs font-mono text-[#10B981] tracking-[0.4em] mb-6 drop-shadow-md bg-black/50 px-4 py-2 rounded-full border border-[#10B981]/30">INVESTIGATION COMPLETE</p>
             <h1 className="text-6xl md:text-9xl font-display font-bold text-white mb-4 tracking-tight leading-[0.95] drop-shadow-2xl">
