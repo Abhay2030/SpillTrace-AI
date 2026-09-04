@@ -40,7 +40,7 @@ export default function AboutPage() {
       <div className="flex-1 mt-20 p-6 md:p-8 max-w-5xl mx-auto w-full">
         {/* Header */}
         <div className="text-center mb-16 pt-8">
-          <p className="text-xs font-mono text-[var(--accent-ocean)] tracking-[0.3em] mb-3">SIH 2026 • PROBLEM SIH26143 • NTRO</p>
+          <p className="text-xs font-mono text-[var(--accent-ocean)] tracking-[0.3em] mb-3">MINISTRY OF DISASTER MANAGEMENT • NTRO</p>
           <h1 className="text-4xl md:text-6xl font-display font-bold mb-4 tracking-tight">Maritime Incident<br/>Intelligence</h1>
           <p className="text-lg text-[var(--text-secondary)] font-light max-w-2xl mx-auto">
             SpillTrace AI combines satellite aperture radar, automatic identification systems, and metocean drift modeling to probabilistically identify the source of illegal maritime oil spills.
