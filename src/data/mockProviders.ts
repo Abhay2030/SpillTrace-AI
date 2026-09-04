@@ -121,7 +121,6 @@ export const generateMockVessels = (): MarineCadastreVesselData[] => {
       baseDateTime: "2026-09-04T08:00:00Z",
       destination: "INTERNATIONAL WATERS",
       eta: "2026-09-08T00:00:00Z",
-      sog: Number((10 + Math.random() * 10).toFixed(1)),
     });
   }
 
