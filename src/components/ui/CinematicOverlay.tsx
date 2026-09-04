@@ -4,8 +4,13 @@ import React, { useEffect, useRef } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Link from "next/link";
-import Image from "next/image";
+import dynamic from "next/dynamic";
 import { Satellite, Droplets, Ship, Search, ShieldAlert, Brain, Activity, Radio, ChevronDown, Crosshair, AlertTriangle, ArrowRight, Compass } from "lucide-react";
+
+const HeroGlobeWidget = dynamic(
+  () => import("@/components/canvas/HeroGlobeWidget"),
+  { ssr: false }
+);
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -147,13 +152,41 @@ export default function CinematicOverlay() {
             <p className="text-2xl text-gray-300 font-light max-w-lg mb-12 drop-shadow-md leading-relaxed">
               From Space to Suspect.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 mb-16">
+            <div className="flex flex-col sm:flex-row gap-4 mb-8">
               <Link href="/investigate" className="btn-primary flex items-center justify-center bg-[#0077B6] hover:bg-[#023E8A] border border-[#00B4D8]/50 shadow-[0_0_20px_rgba(0,180,216,0.3)]">
                 Launch Intelligence Center
               </Link>
               <Link href="/about" className="btn-secondary flex items-center justify-center text-white border-white/30 hover:bg-white/10 backdrop-blur-sm">
                 Explore Technology
               </Link>
+            </div>
+
+            {/* 🌍 REAL-TIME 3D EARTH GLOBE & SATELLITE SCANNING WIDGET (BELOW INVESTIGATE BUTTON) */}
+            <div className="w-full max-w-xl mb-10 bg-black/60 border border-[#00F0FF]/40 backdrop-blur-xl rounded-3xl p-4 shadow-[0_0_35px_rgba(0,240,255,0.2)] hover:border-[#00F0FF] transition-all">
+              <div className="flex items-center justify-between border-b border-white/10 pb-3 mb-3">
+                <div className="flex items-center gap-2">
+                  <Satellite className="w-4 h-4 text-[#00F0FF] animate-pulse" />
+                  <span className="text-xs font-mono font-bold tracking-wider text-[#00F0FF]">
+                    REAL-TIME 3D EARTH & SATELLITE SCANNER
+                  </span>
+                </div>
+                <span className="flex items-center gap-1.5 text-[9px] font-mono font-bold px-2.5 py-0.5 bg-[#10B981]/20 text-[#10B981] border border-[#10B981]/40 rounded-full">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#10B981] animate-ping" />
+                  LIVE ORBITAL SCAN
+                </span>
+              </div>
+
+              <div className="w-full h-72 sm:h-80 rounded-2xl overflow-hidden relative border border-white/10 shadow-inner bg-[#020610]">
+                <HeroGlobeWidget />
+              </div>
+
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-[10px] font-mono text-gray-300 mt-3 pt-2.5 border-t border-white/10">
+                <div className="flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-[#FF0055] animate-pulse shrink-0" />
+                  <span>OIL SPILL ANOMALY #8941: <strong className="text-[#00F0FF]">8.4 km² MONITORED</strong></span>
+                </div>
+                <span className="text-gray-400 font-semibold">ROTATING GLOBE • OCEAN WAVES • SAR BEAM</span>
+              </div>
             </div>
 
             {/* Trust Metrics */}
