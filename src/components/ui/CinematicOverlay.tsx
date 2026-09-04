@@ -234,7 +234,7 @@ export default function CinematicOverlay() {
             <div className="flex items-center gap-4 mb-6">
               <img src="/logo.png" alt="SpillTrace AI Logo" className="h-16 md:h-20 w-auto object-contain drop-shadow-[0_0_25px_rgba(0,180,216,0.4)]" />
               <div className="flex items-center gap-2">
-                <span className="threat-badge low bg-[#10B981]/20 border-[#10B981]/40 backdrop-blur-sm">SIH 2026</span>
+                <span className="threat-badge low bg-[#10B981]/20 border-[#10B981]/40 backdrop-blur-sm">MINISTRY OF DISASTER MANAGEMENT</span>
                 <span className="threat-badge bg-[#0077B6]/20 border-[#0077B6]/40 text-[#00B4D8] backdrop-blur-sm">NTRO</span>
                 <span className="threat-badge bg-[#00B4D8]/20 border-[#00B4D8]/40 text-[#CAF0F8] backdrop-blur-sm">SENTINEL-1</span>
               </div>
