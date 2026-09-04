@@ -2,6 +2,8 @@
 // Reference: NOAA / BOEM AccessAIS Data Dictionary (https://marinecadastre.gov/accessais/)
 
 export interface MarineCadastreVesselData {
+  id: string;                  // Compatible ID string
+  type: string;                // Compatible Type string
   mmsi: string;                // 9-digit MMSI Number (e.g. "367891230")
   imo: string;                 // IMO Number (e.g. "IMO 9481920")
   vesselName: string;          // Official Ship Name
@@ -12,6 +14,7 @@ export interface MarineCadastreVesselData {
   sog: number;                 // Speed Over Ground in knots
   cog: number;                 // Course Over Ground (0-359°)
   heading: number;             // True Heading (0-359°)
+  speed: number;               // Speed alias (SOG)
   position: [number, number];  // [Longitude, Latitude] WGS84
   dimensions: {
     length: number;            // Length in meters
@@ -25,6 +28,8 @@ export interface MarineCadastreVesselData {
   candidateScore?: number;    // SpillTrace AI Attribution Score
   isSuspect?: boolean;
 }
+
+export type VesselData = MarineCadastreVesselData;
 
 export interface IncidentData {
   id: string;
@@ -51,6 +56,8 @@ export const generateMockVessels = (): MarineCadastreVesselData[] => {
   
   // Suspect #1: MT ALFA SEAWAY (Oil Tanker - Code 80)
   vessels.push({
+    id: "VESSEL-82A",
+    type: "Tanker",
     mmsi: "235890142",
     imo: "IMO 9481920",
     vesselName: "MT ALFA SEAWAY",
@@ -61,6 +68,7 @@ export const generateMockVessels = (): MarineCadastreVesselData[] => {
     sog: 14.2,
     cog: 142.5,
     heading: 140,
+    speed: 14.2,
     position: [baseLng + 0.08, baseLat + 0.04],
     dimensions: { length: 274, width: 48, draft: 14.8 },
     transponderClass: "Class A",
@@ -73,6 +81,8 @@ export const generateMockVessels = (): MarineCadastreVesselData[] => {
 
   // Candidate #2: MV PACIFIC STAR (Container - Code 70)
   vessels.push({
+    id: "VESSEL-41C",
+    type: "Cargo",
     mmsi: "367123987",
     imo: "IMO 9128301",
     vesselName: "MV PACIFIC STAR",
@@ -83,6 +93,7 @@ export const generateMockVessels = (): MarineCadastreVesselData[] => {
     sog: 18.5,
     cog: 210.0,
     heading: 208,
+    speed: 18.5,
     position: [baseLng - 0.22, baseLat + 0.18],
     dimensions: { length: 334, width: 42, draft: 11.2 },
     transponderClass: "Class A",
@@ -95,16 +106,19 @@ export const generateMockVessels = (): MarineCadastreVesselData[] => {
 
   // MarineCadastre Fleet Noise
   const vesselTypePool = [
-    { code: 80, group: "Tanker (Code 80-89)", prefix: "TANKER" },
-    { code: 70, group: "Cargo (Code 70-79)", prefix: "CARGO CONTAINER" },
-    { code: 30, group: "Fishing (Code 30)", prefix: "FISHING TRAWLER" },
-    { code: 60, group: "Passenger (Code 60-69)", prefix: "CRUISE LINER" },
-    { code: 35, group: "Tug/Military (Code 35)", prefix: "PATROL ESCORT" },
+    { code: 80, group: "Tanker (Code 80-89)", prefix: "TANKER", type: "Tanker" },
+    { code: 70, group: "Cargo (Code 70-79)", prefix: "CARGO CONTAINER", type: "Cargo" },
+    { code: 30, group: "Fishing (Code 30)", prefix: "FISHING TRAWLER", type: "Fishing" },
+    { code: 60, group: "Passenger (Code 60-69)", prefix: "CRUISE LINER", type: "Passenger" },
+    { code: 35, group: "Tug/Military (Code 35)", prefix: "PATROL ESCORT", type: "Other" },
   ];
 
   for (let i = 0; i < 30; i++) {
     const typeObj = vesselTypePool[i % vesselTypePool.length];
+    const sogVal = Number((8 + Math.random() * 12).toFixed(1));
     vessels.push({
+      id: `VESSEL-RND-${i}`,
+      type: typeObj.type,
       mmsi: `${367000000 + i * 1493}`,
       imo: `IMO ${9000000 + i * 1111}`,
       vesselName: `${typeObj.prefix} ${100 + i}`,
@@ -112,9 +126,10 @@ export const generateMockVessels = (): MarineCadastreVesselData[] => {
       vesselTypeCode: typeObj.code,
       vesselTypeGroup: typeObj.group,
       navStatus: i % 5 === 0 ? "1: At anchor" : "0: Under way using engine",
-      sog: Number((8 + Math.random() * 12).toFixed(1)),
+      sog: sogVal,
       cog: Math.floor(Math.random() * 360),
       heading: Math.floor(Math.random() * 360),
+      speed: sogVal,
       position: [baseLng + (Math.random() - 0.5) * 4, baseLat + (Math.random() - 0.5) * 4],
       dimensions: { length: 120 + i * 5, width: 20 + (i % 5), draft: 6.5 + (i % 4) },
       transponderClass: "Class A",
