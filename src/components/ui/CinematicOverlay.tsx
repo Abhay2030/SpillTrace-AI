@@ -4,6 +4,7 @@ import React, { useEffect, useRef } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Link from "next/link";
+import Image from "next/image";
 import dynamic from "next/dynamic";
 import { Satellite, Droplets, Ship, Search, ShieldAlert, Brain, Activity, Radio, ChevronDown, Crosshair, AlertTriangle, ArrowRight, Compass } from "lucide-react";
 
