@@ -27,12 +27,18 @@ export default function InvestigatePage() {
         {/* Left Sidebar (Investigation State) */}
         <div className="w-full lg:w-96 flex-shrink-0 h-full flex flex-col gap-4 overflow-y-auto pr-2 pb-24">
           <div className="glass-panel p-4 sticky top-0 z-10 bg-[var(--bg-secondary)] backdrop-blur-md">
-            <h2 className="font-display font-medium text-lg border-b border-[var(--border-subtle)] pb-2 mb-2">
-              Investigation Active
-            </h2>
+            <div className="flex items-center gap-3 border-b border-[var(--border-subtle)] pb-3 mb-2">
+              <img src="/logo.png" alt="SpillTrace AI Logo" className="h-8 w-auto object-contain" />
+              <div>
+                <h2 className="font-display font-medium text-base leading-tight">
+                  SpillTrace AI Command
+                </h2>
+                <p className="text-[10px] font-mono text-[var(--text-tertiary)] uppercase tracking-wider">Active Investigation</p>
+              </div>
+            </div>
             <div className="flex justify-between items-center text-xs font-mono text-[var(--text-secondary)]">
                <span>ARABIAN SEA</span>
-               <span className="text-[var(--risk-critical)]">1 SPILL DETECTED</span>
+               <span className="text-[var(--risk-critical)] font-semibold">1 SPILL DETECTED</span>
             </div>
           </div>
           

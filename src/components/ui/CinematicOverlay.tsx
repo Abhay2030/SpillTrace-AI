@@ -44,10 +44,13 @@ export default function CinematicOverlay() {
       {/* ===== HERO ===== */}
       <section className="chapter-panel h-[150vh] flex items-center px-8 md:px-20">
         <div className="content pointer-events-auto max-w-3xl">
-          <div className="flex items-center gap-3 mb-6">
-            <span className="threat-badge low">SIH 2026</span>
-            <span className="threat-badge" style={{background:'rgba(0,119,182,0.08)',color:'var(--accent-ocean)',border:'1px solid rgba(0,119,182,0.15)'}}>NTRO</span>
-            <span className="threat-badge" style={{background:'rgba(0,180,216,0.08)',color:'var(--accent-cyan)',border:'1px solid rgba(0,180,216,0.15)'}}>SENTINEL-1</span>
+          <div className="flex items-center gap-4 mb-6">
+            <img src="/logo.png" alt="SpillTrace AI Logo" className="h-16 md:h-20 w-auto object-contain drop-shadow-[0_0_25px_rgba(0,180,216,0.4)]" />
+            <div className="flex items-center gap-2">
+              <span className="threat-badge low">SIH 2026</span>
+              <span className="threat-badge" style={{background:'rgba(0,119,182,0.08)',color:'var(--accent-ocean)',border:'1px solid rgba(0,119,182,0.15)'}}>NTRO</span>
+              <span className="threat-badge" style={{background:'rgba(0,180,216,0.08)',color:'var(--accent-cyan)',border:'1px solid rgba(0,180,216,0.15)'}}>SENTINEL-1</span>
+            </div>
           </div>
           <p className="text-xs font-mono text-[var(--accent-ocean)] tracking-[0.3em] mb-3 uppercase">Anomaly Detected</p>
           <h1 className="text-6xl md:text-8xl font-display font-bold text-[var(--text-primary)] mb-3 tracking-tight leading-[0.95]">

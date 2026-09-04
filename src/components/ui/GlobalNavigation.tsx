@@ -38,9 +38,18 @@ export default function GlobalNavigation() {
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${scrolled ? 'bg-[var(--surface-glass)] backdrop-blur-md py-3 border-b border-[var(--border-subtle)] shadow-[var(--shadow-elegant)]' : 'bg-transparent py-6'}`}
       >
         <div className="max-w-[1400px] mx-auto px-8 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2">
-            <div className={`w-2 h-2 rounded-full ${isLive ? 'bg-[var(--risk-critical)]' : 'bg-[var(--accent-cyan)]'} animate-pulse`} />
-            <span className="text-[var(--text-primary)] font-display font-medium tracking-widest text-sm">SPILLTRACE AI</span>
+          <Link href="/" className="flex items-center gap-3 group">
+            <div className="relative flex items-center justify-center">
+              <img 
+                src="/logo.png" 
+                alt="SpillTrace AI Logo" 
+                className="h-8 w-auto object-contain rounded transition-transform group-hover:scale-105" 
+              />
+              <div className={`absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full ${isLive ? 'bg-[var(--risk-critical)]' : 'bg-[var(--accent-cyan)]'} animate-pulse`} />
+            </div>
+            <span className="text-[var(--text-primary)] font-display font-medium tracking-widest text-sm group-hover:text-[var(--accent-ocean)] transition-colors">
+              SPILLTRACE AI
+            </span>
           </Link>
           
           <div className="hidden lg:flex items-center gap-8 text-[10px] font-mono tracking-[0.2em] text-[var(--text-secondary)]">
