@@ -58,6 +58,41 @@ export default function InvestigationMap() {
     ? "https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json"
     : "https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json";
 
+  // Live Animation State
+  const [liveVessels, setLiveVessels] = useState(mockVessels);
+  const [spillRadius, setSpillRadius] = useState(0.05);
+
+  useEffect(() => {
+    let animationFrameId: number;
+    let lastTime = performance.now();
+
+    const animate = (time: number) => {
+      const delta = (time - lastTime) / 1000; // seconds
+      lastTime = time;
+
+      // Animate vessels based on heading and speed
+      setLiveVessels(prev => prev.map(v => {
+        // Heading 0 is North (Y+), 90 is East (X+)
+        const speedScale = 0.0005; // Make movement visible for the demo
+        const dx = Math.sin(v.heading * (Math.PI / 180)) * v.speed * speedScale * delta;
+        const dy = Math.cos(v.heading * (Math.PI / 180)) * v.speed * speedScale * delta;
+        
+        return {
+          ...v,
+          position: [v.position[0] + dx, v.position[1] + dy]
+        };
+      }));
+
+      // Slowly expand/drift the spill polygon to simulate live physics
+      setSpillRadius(prev => (prev < 0.15 ? prev + (0.0002 * delta) : prev));
+
+      animationFrameId = requestAnimationFrame(animate);
+    };
+
+    animationFrameId = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(animationFrameId);
+  }, []);
+
   // Handle Camera Choreography
   useEffect(() => {
     if (mapRef.current) {
@@ -72,7 +107,7 @@ export default function InvestigationMap() {
     }
   }, [currentStep]);
 
-  // GeoJSON for Spill Polygon (Simulated as a simple circle polygon around center)
+  // Dynamic GeoJSON for Spill Polygon
   const spillGeojson = {
     type: 'FeatureCollection',
     features: [
@@ -81,11 +116,11 @@ export default function InvestigationMap() {
         geometry: {
           type: 'Polygon',
           coordinates: [[
-            [mockIncident.center[0] - 0.05, mockIncident.center[1] - 0.05],
-            [mockIncident.center[0] + 0.05, mockIncident.center[1] - 0.05],
-            [mockIncident.center[0] + 0.05, mockIncident.center[1] + 0.05],
-            [mockIncident.center[0] - 0.05, mockIncident.center[1] + 0.05],
-            [mockIncident.center[0] - 0.05, mockIncident.center[1] - 0.05]
+            [mockIncident.center[0] - spillRadius, mockIncident.center[1] - spillRadius],
+            [mockIncident.center[0] + spillRadius, mockIncident.center[1] - spillRadius],
+            [mockIncident.center[0] + spillRadius, mockIncident.center[1] + spillRadius],
+            [mockIncident.center[0] - spillRadius, mockIncident.center[1] + spillRadius],
+            [mockIncident.center[0] - spillRadius, mockIncident.center[1] - spillRadius]
           ]]
         },
         properties: { id: mockIncident.id }
@@ -93,10 +128,10 @@ export default function InvestigationMap() {
     ]
   };
 
-  // GeoJSON for Vessels
+  // Dynamic GeoJSON for Vessels
   const vesselsGeojson = {
     type: 'FeatureCollection',
-    features: mockVessels.map(v => ({
+    features: liveVessels.map(v => ({
       type: 'Feature',
       geometry: { type: 'Point', coordinates: v.position },
       properties: { id: v.id, type: v.type }
