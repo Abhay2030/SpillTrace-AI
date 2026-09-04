@@ -162,7 +162,7 @@ export default function CinematicOverlay() {
               <div className="w-px bg-white/20" />
               <div className="flex-1"><p className="text-3xl font-bold font-display text-[#E63946]"><span className="count-up" data-value="94.2">0</span>%</p><p className="text-[10px] font-mono text-gray-400 tracking-widest mt-1">CONFIDENCE</p></div>
               <div className="w-px bg-white/20" />
-              <div className="flex-1"><p className="text-3xl font-bold font-display text-white"><span className="count-up" data-value="8.4">0</span> km²</p><p className="text-[10px] font-mono text-gray-400 tracking-widest mt-1">SPILL AREA</p></div>
+              <div className="flex-1"><p className="text-3xl font-bold font-display text-[#00F0FF] shadow-[0_0_15px_rgba(0,240,255,0.4)]"><span className="count-up" data-value="8.4">8.4</span> km²</p><p className="text-[10px] font-mono text-gray-300 font-bold tracking-widest mt-1">SPILL AREA</p></div>
             </div>
 
             {/* Scroll Indicator */}
@@ -194,10 +194,10 @@ export default function CinematicOverlay() {
                 <p className="text-4xl font-bold text-[#E63946] mb-3">97.4%</p>
                 <div className="h-1.5 bg-gray-800 rounded-full overflow-hidden"><div className="h-full bg-[#E63946]" style={{width:'97.4%'}} /></div>
               </div>
-              <div className="metric-card flex-1 bg-black/60 border-white/10 backdrop-blur-md">
-                <p className="text-[10px] font-mono text-gray-400 tracking-widest mb-2">AFFECTED REGION</p>
-                <p className="text-4xl font-bold text-white mb-1">8.4<span className="text-xl ml-1 text-gray-400">km²</span></p>
-                <p className="text-xs text-gray-400 mt-2 font-mono">15.421°N, 65.239°E</p>
+              <div className="metric-card flex-1 bg-black/60 border-white/10 backdrop-blur-md border border-[#00F0FF]/30">
+                <p className="text-[10px] font-mono text-gray-300 tracking-widest mb-2 font-bold">AFFECTED SPILL REGION</p>
+                <p className="text-4xl font-extrabold text-[#00F0FF] mb-1 drop-shadow-[0_0_15px_rgba(0,240,255,0.6)]">8.4<span className="text-xl ml-1 text-[#00F0FF] font-bold">km²</span></p>
+                <p className="text-xs text-gray-300 mt-2 font-mono font-semibold">15.421°N, 65.239°E</p>
               </div>
             </div>
           </div>

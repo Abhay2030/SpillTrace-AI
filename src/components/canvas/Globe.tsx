@@ -456,7 +456,7 @@ export default function Globe() {
               <span className="text-[#FF0055] px-1.5 py-0.5 bg-[#FF0055]/20 rounded font-semibold animate-pulse">ACTIVE</span>
             </div>
             <div>COORDINATES: 24.12° N, 58.45° E (ARABIAN SEA)</div>
-            <div>SLICK SURFACE AREA: 14.8 km²</div>
+            <div className="text-white font-bold my-0.5">SLICK SURFACE AREA: <span className="text-[#00F0FF] text-xs font-extrabold bg-[#00F0FF]/20 px-1.5 py-0.5 rounded border border-[#00F0FF]/40">8.4 km²</span></div>
             <div>DRIFT TRAJECTORY: 2.8 kts @ 142° SE</div>
             <div className="text-[#FFB703] font-semibold mt-1">STATUS: AI ATTRIBUTION MATCH FOUND</div>
           </div>

@@ -43,7 +43,7 @@ export interface IncidentData {
 export const mockIncident: IncidentData = {
   id: "INC-2026-09-04-ARABIAN",
   center: [65.234, 15.432], // Arabian Sea
-  spillAreaKm2: 14.8,
+  spillAreaKm2: 8.4,
   confidence: 98.4,
   timestamp: "2026-09-04T08:00:00Z",
   sourceSat: "ESA SENTINEL-1 C-BAND SAR / NOAA ACCESSAIS",

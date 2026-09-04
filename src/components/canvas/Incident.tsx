@@ -53,10 +53,16 @@ export default function Incident() {
       <mesh position={[0, 0, 0]}>
         <planeGeometry args={[1, 0.5]} />
         <meshBasicMaterial color="#06d6d6" transparent opacity={0.6} side={THREE.DoubleSide} />
-        <Html position={[0.5, 0.5, 0]} className="text-white text-[10px] font-mono pointer-events-none">
-          <div className="bg-[#0A0A0A]/80 border border-[#06d6d6]/50 p-1 px-2 whitespace-nowrap">
-            <span className="text-[#06d6d6]">CONFIDENCE: 97.4%</span><br/>
-            AREA: 8.4 KM²
+        <Html position={[0.5, 0.5, 0]} className="pointer-events-none z-30">
+          <div className="bg-[#030712]/95 border-2 border-[#00F0FF] backdrop-blur-xl p-3 rounded-xl text-xs font-mono text-white shadow-[0_0_25px_rgba(0,240,255,0.6)] whitespace-nowrap">
+            <div className="flex items-center gap-1.5 text-[#00F0FF] font-bold border-b border-[#00F0FF]/30 pb-1 mb-1 text-sm">
+              <span className="w-2 h-2 rounded-full bg-[#00F0FF] animate-ping" />
+              SAR SPILL DETECTED
+            </div>
+            <div className="text-gray-300">AI CONFIDENCE: <span className="text-[#00FF66] font-bold">97.4%</span></div>
+            <div className="text-white text-sm font-bold tracking-wider mt-1.5 bg-[#00F0FF]/20 px-2.5 py-1 rounded-lg border border-[#00F0FF]/50 text-center shadow-[0_0_15px_rgba(0,240,255,0.5)]">
+              SPILL AREA: <span className="text-[#00F0FF] font-extrabold text-base">8.4 km²</span>
+            </div>
           </div>
         </Html>
       </mesh>

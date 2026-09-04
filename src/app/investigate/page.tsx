@@ -61,7 +61,7 @@ export default function InvestigatePage() {
               </div>
               <div className="bg-white/5 border border-white/10 p-2 rounded-lg">
                 <div className="text-gray-400">SURFACE AREA</div>
-                <div className="text-[#00F0FF] font-bold">14.8 KM² (SLICK)</div>
+                <div className="text-[#00F0FF] font-extrabold text-xs">8.4 KM² (SLICK)</div>
               </div>
             </div>
 
