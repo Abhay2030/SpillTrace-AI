@@ -163,7 +163,7 @@ export default function CinematicOverlay() {
             </div>
 
             {/* Trust Metrics */}
-            <div className="flex gap-8 text-center bg-black/40 p-6 rounded-2xl backdrop-blur-md border border-white/10 max-w-2xl mb-12">
+            <div className="flex gap-8 text-center bg-black/40 p-6 rounded-2xl backdrop-blur-md border border-white/10 max-w-2xl mb-16">
               <div className="flex-1"><p className="text-3xl font-bold font-display text-white count-up" data-value="247">0</p><p className="text-[10px] font-mono text-gray-400 tracking-widest mt-1">VESSELS ANALYZED</p></div>
               <div className="w-px bg-white/20" />
               <div className="flex-1"><p className="text-3xl font-bold font-display text-[#E63946]"><span className="count-up" data-value="94.2">0</span>%</p><p className="text-[10px] font-mono text-gray-400 tracking-widest mt-1">CONFIDENCE</p></div>
@@ -171,36 +171,8 @@ export default function CinematicOverlay() {
               <div className="flex-1"><p className="text-3xl font-bold font-display text-[#00F0FF] shadow-[0_0_15px_rgba(0,240,255,0.4)]"><span className="count-up" data-value="8.4">8.4</span> km²</p><p className="text-[10px] font-mono text-gray-300 font-bold tracking-widest mt-1">SPILL AREA</p></div>
             </div>
 
-            {/* 🌍 REAL-TIME 3D EARTH GLOBE & SATELLITE SCANNING WIDGET (QUITE BIG BELOW LAUNCH INTELLIGENCE CENTER) */}
-            <div className="w-full max-w-3xl mb-12 bg-black/60 border border-[#00F0FF]/40 backdrop-blur-xl rounded-3xl p-5 shadow-[0_0_40px_rgba(0,240,255,0.25)] hover:border-[#00F0FF] transition-all">
-              <div className="flex items-center justify-between border-b border-white/10 pb-3 mb-4">
-                <div className="flex items-center gap-2.5">
-                  <Satellite className="w-5 h-5 text-[#00F0FF] animate-pulse" />
-                  <span className="text-sm font-mono font-bold tracking-wider text-[#00F0FF]">
-                    REAL-TIME 3D EARTH & SATELLITE SCANNER
-                  </span>
-                </div>
-                <span className="flex items-center gap-1.5 text-[10px] font-mono font-bold px-3 py-1 bg-[#10B981]/20 text-[#10B981] border border-[#10B981]/40 rounded-full">
-                  <span className="w-2 h-2 rounded-full bg-[#10B981] animate-ping" />
-                  LIVE ORBITAL SCAN
-                </span>
-              </div>
-
-              <div className="w-full h-[420px] sm:h-[500px] rounded-2xl overflow-hidden relative border border-white/10 shadow-2xl bg-[#020610]">
-                <HeroGlobeWidget />
-              </div>
-
-              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-xs font-mono text-gray-300 mt-4 pt-3 border-t border-white/10">
-                <div className="flex items-center gap-2">
-                  <span className="w-2.5 h-2.5 rounded-full bg-[#FF0055] animate-pulse shrink-0" />
-                  <span>OIL SPILL ANOMALY #8941: <strong className="text-[#00F0FF]">8.4 km² MONITORED</strong></span>
-                </div>
-                <span className="text-gray-400 font-semibold">ROTATING 3D GLOBE • OCEAN WAVES • SAR LASER BEAM</span>
-              </div>
-            </div>
-
             {/* Scroll Indicator */}
-            <div className="mt-12 flex flex-col items-center sm:items-start gap-3 opacity-60">
+            <div className="mt-8 flex flex-col items-center sm:items-start gap-3 opacity-60">
               <div className="w-6 h-10 rounded-full border border-white/50 flex justify-center pt-2">
                 <div className="w-1.5 h-2.5 rounded-full bg-white animate-scroll" />
               </div>
@@ -467,13 +439,41 @@ export default function CinematicOverlay() {
                 </div>
               ))}
             </div>
-            <div className="flex flex-col sm:flex-row justify-center gap-6">
+            <div className="flex flex-col sm:flex-row justify-center gap-6 mb-12">
               <Link href="/investigate" className="btn-primary bg-[#0077B6] hover:bg-[#023E8A] border border-[#00B4D8]/50 shadow-[0_0_30px_rgba(0,180,216,0.4)] px-8 py-4 text-sm">
                 Launch Intelligence Center
               </Link>
               <Link href="/about" className="btn-secondary text-white border-white/30 hover:bg-white/10 backdrop-blur-sm px-8 py-4 text-sm">
                 System Methodology
               </Link>
+            </div>
+
+            {/* 🌍 REAL-TIME 3D EARTH GLOBE & SATELLITE SCANNING WIDGET (AT LAST BELOW LAUNCH INTELLIGENCE CENTER) */}
+            <div className="w-full max-w-3xl bg-black/70 border border-[#00F0FF]/40 backdrop-blur-2xl rounded-3xl p-6 shadow-[0_0_50px_rgba(0,240,255,0.3)] hover:border-[#00F0FF] transition-all text-left">
+              <div className="flex items-center justify-between border-b border-white/10 pb-3.5 mb-4">
+                <div className="flex items-center gap-2.5">
+                  <Satellite className="w-5 h-5 text-[#00F0FF] animate-pulse" />
+                  <span className="text-sm font-mono font-bold tracking-wider text-[#00F0FF]">
+                    REAL-TIME 3D EARTH & SATELLITE SCANNER
+                  </span>
+                </div>
+                <span className="flex items-center gap-1.5 text-[10px] font-mono font-bold px-3 py-1 bg-[#10B981]/20 text-[#10B981] border border-[#10B981]/40 rounded-full">
+                  <span className="w-2 h-2 rounded-full bg-[#10B981] animate-ping" />
+                  LIVE ORBITAL SCAN
+                </span>
+              </div>
+
+              <div className="w-full h-[420px] sm:h-[500px] rounded-2xl overflow-hidden relative border border-white/10 shadow-2xl bg-[#020610]">
+                <HeroGlobeWidget />
+              </div>
+
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-xs font-mono text-gray-300 mt-4 pt-3 border-t border-white/10">
+                <div className="flex items-center gap-2">
+                  <span className="w-2.5 h-2.5 rounded-full bg-[#FF0055] animate-pulse shrink-0" />
+                  <span>OIL SPILL ANOMALY #8941: <strong className="text-[#00F0FF]">8.4 km² MONITORED</strong></span>
+                </div>
+                <span className="text-gray-400 font-semibold">ROTATING 3D GLOBE • OCEAN WAVES • SAR LASER BEAM</span>
+              </div>
             </div>
           </div>
         </section>
