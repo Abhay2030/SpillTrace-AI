@@ -10,7 +10,7 @@ export default function HeroGlobeWidget() {
   return (
     <div className="w-full h-full relative rounded-2xl overflow-hidden bg-[#020610]">
       <Canvas
-        camera={{ position: [0, 1.5, 12], fov: 42 }}
+        camera={{ position: [0, 0.6, 9.0], fov: 46 }}
         gl={{ antialias: true, alpha: true }}
         style={{ background: "transparent" }}
       >
