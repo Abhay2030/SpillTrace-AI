@@ -4,6 +4,10 @@ import { Canvas } from "@react-three/fiber";
 import { Environment } from "@react-three/drei";
 import React from "react";
 import Globe from "./Globe";
+import CameraRig from "./CameraRig";
+import Satellite from "./Satellite";
+import Incident from "./Incident";
+import DataVisualization from "./DataVisualization";
 
 export default function SceneManager() {
   return (
@@ -15,11 +19,13 @@ export default function SceneManager() {
       <ambientLight intensity={0.5} />
       <directionalLight position={[10, 10, 5]} intensity={1.5} />
       
-      {/* 
-        This is where the cinematic objects will go.
-        For now, just the Globe.
-      */}
+      <CameraRig />
+      
+      {/* Cinematic Objects */}
       <Globe />
+      <Satellite />
+      <Incident />
+      <DataVisualization />
       
       <Environment preset="night" />
     </Canvas>

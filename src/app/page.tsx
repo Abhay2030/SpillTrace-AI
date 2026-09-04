@@ -14,9 +14,16 @@ const CinematicOverlay = dynamic(
   { ssr: false }
 );
 
+const GlobalNavigation = dynamic(
+  () => import("@/components/ui/GlobalNavigation"),
+  { ssr: false }
+);
+
 export default function Home() {
   return (
     <main className="relative w-full min-h-screen bg-[var(--bg-primary)]">
+      <GlobalNavigation />
+      
       {/* 3D WebGL Background Layer (Fixed) */}
       <div className="fixed inset-0 z-0">
         <SceneManager />
