@@ -1,48 +1,44 @@
 "use client";
 
-import React, { useRef, useMemo } from "react";
+import React, { useRef, useMemo, useEffect } from "react";
 import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 import { Sphere, Ring, Html, Line } from "@react-three/drei";
 
 // ============================================================================
-// 🌊 1. PHOTOREALISTIC OCEAN SHADER (Multi-Octave Waves + Solar Specular)
+// 🌍 1. GOOGLE EARTH REAL-TIME LANDMASS & OCEAN SHADER
 // ============================================================================
-const RealisticOceanShader = {
+const RealTimeEarthShader = {
   uniforms: {
     uTime: { value: 0 },
-    uDeepColor: { value: new THREE.Color("#000B18") },
-    uOceanColor: { value: new THREE.Color("#004E89") },
-    uSurfaceColor: { value: new THREE.Color("#00A8E8") },
-    uFoamColor: { value: new THREE.Color("#C4F1F9") },
-    uSunDirection: { value: new THREE.Vector3(10, 20, 10).normalize() },
+    uEarthTexture: { value: null as THREE.Texture | null },
+    uHasTexture: { value: 0 }, // 1 if texture loaded, 0 if using procedural fallback
+    uDeepOcean: { value: new THREE.Color("#011428") },
+    uSurfaceOcean: { value: new THREE.Color("#005F73") },
+    uFoamColor: { value: new THREE.Color("#94D2BD") },
+    uSunDirection: { value: new THREE.Vector3(12, 18, 12).normalize() },
   },
   vertexShader: `
     uniform float uTime;
     varying vec3 vNormal;
     varying vec3 vPosition;
+    varying vec2 vUv;
     varying float vDisplacement;
 
-    // Harmonic wave superposition
+    // Harmonic ocean wave function
     float getWave(vec3 p) {
-      float swell = sin(p.x * 4.5 + uTime * 1.8) * cos(p.y * 4.5 + uTime * 1.4) * sin(p.z * 4.5 + uTime * 1.6);
-      float chop  = sin(p.x * 13.0 - uTime * 2.8) * cos(p.z * 13.0 + uTime * 2.2) * 0.32;
-      float micro = sin(p.y * 26.0 + uTime * 4.2) * sin(p.x * 26.0 - uTime * 3.8) * 0.14;
-      return swell + chop + micro;
+      float swell = sin(p.x * 5.0 + uTime * 2.0) * cos(p.y * 5.0 + uTime * 1.6) * sin(p.z * 5.0 + uTime * 1.8);
+      float chop  = sin(p.x * 14.0 - uTime * 3.0) * cos(p.z * 14.0 + uTime * 2.4) * 0.3;
+      return swell + chop;
     }
 
     void main() {
+      vUv = uv;
+      vNormal = normal;
       vec3 pos = position;
-      float disp = getWave(pos) * 0.048;
+      
+      float disp = getWave(pos) * 0.04;
       vDisplacement = disp;
-
-      // Approximate perturbed normal using finite difference
-      vec3 e = vec3(0.01, 0.0, 0.0);
-      float dX = getWave(pos + e) - getWave(pos - e);
-      float dY = getWave(pos + e.yxy) - getWave(pos - e.yxy);
-      float dZ = getWave(pos + e.yyx) - getWave(pos - e.yyx);
-      vec3 grad = vec3(dX, dY, dZ) * 2.5;
-      vNormal = normalize(normal - grad);
 
       vec3 newPos = pos + normal * disp;
       vPosition = newPos;
@@ -51,45 +47,61 @@ const RealisticOceanShader = {
   `,
   fragmentShader: `
     uniform float uTime;
-    uniform vec3 uDeepColor;
-    uniform vec3 uOceanColor;
-    uniform vec3 uSurfaceColor;
+    uniform sampler2D uEarthTexture;
+    uniform float uHasTexture;
+    uniform vec3 uDeepOcean;
+    uniform vec3 uSurfaceOcean;
     uniform vec3 uFoamColor;
     uniform vec3 uSunDirection;
 
     varying vec3 vNormal;
     varying vec3 vPosition;
+    varying vec2 vUv;
     varying float vDisplacement;
 
     void main() {
       vec3 norm = normalize(vNormal);
       vec3 viewDir = normalize(cameraPosition - vPosition);
 
-      // Diffuse Lighting
-      float diff = max(dot(norm, uSunDirection), 0.0);
-
-      // Solar Specular Glint
-      vec3 reflectDir = reflect(-uSunDirection, norm);
-      float spec = pow(max(dot(viewDir, reflectDir), 0.0), 42.0);
-
-      // Fresnel Horizon Rim
-      float fresnel = pow(1.0 - max(0.0, dot(viewDir, norm)), 3.0);
-
-      // Depth gradient color blending
-      vec3 color = mix(uDeepColor, uOceanColor, vDisplacement * 10.0 + 0.45);
-      color = mix(color, uSurfaceColor, diff * 0.35 + 0.1);
-
-      // Dynamic Foam Crests
-      if (vDisplacement > 0.026) {
-        float foamFactor = smoothstep(0.026, 0.05, vDisplacement);
-        color = mix(color, uFoamColor, foamFactor * 0.85);
+      // 1. Sample Earth Albedo Map (Google Earth Satellite Map)
+      vec4 earthTex = texture2D(uEarthTexture, vUv);
+      
+      // Determine if pixel is Ocean vs Landmass
+      // Ocean pixels are predominantly dark/blue; land pixels contain green/brown/red components
+      float isLand = smoothstep(0.18, 0.35, earthTex.r * 0.5 + earthTex.g * 0.6 - earthTex.b * 0.4);
+      
+      if (uHasTexture < 0.5) {
+        // Fallback procedural detection if texture loading
+        isLand = 0.0;
       }
 
-      // Sun Specular Reflection & Fresnel Glow
-      color += spec * vec3(1.0, 0.95, 0.8) * 0.75;
-      color += fresnel * vec3(0.35, 0.75, 1.0) * 0.4;
+      // 2. Ocean Shader Calculation (Real-time Waves & Specular)
+      float diff = max(dot(norm, uSunDirection), 0.0);
+      vec3 reflectDir = reflect(-uSunDirection, norm);
+      float spec = pow(max(dot(viewDir, reflectDir), 0.0), 38.0);
+      float fresnel = pow(1.0 - max(0.0, dot(viewDir, norm)), 2.8);
 
-      gl_FragColor = vec4(color, 0.95);
+      vec3 oceanColor = mix(uDeepOcean, uSurfaceOcean, vDisplacement * 10.0 + 0.4);
+      oceanColor += diff * vec3(0.0, 0.2, 0.4);
+      
+      if (vDisplacement > 0.025) {
+        oceanColor = mix(oceanColor, uFoamColor, (vDisplacement - 0.025) * 12.0);
+      }
+      oceanColor += spec * vec3(1.0, 0.95, 0.8) * 0.7; // Sun Specular Glint
+
+      // 3. Landmass Shader Calculation (Google Earth Satellite Terrain)
+      vec3 landColor = earthTex.rgb;
+      // Enhance land contrast & vegetation vibrant tones
+      landColor = mix(landColor, vec3(0.1, 0.35, 0.15), 0.15); // Rich Forest Green accent
+      landColor *= (diff * 0.75 + 0.4); // Topographic shading
+
+      // 4. Blend Landmass & Ocean
+      vec3 finalColor = mix(oceanColor, landColor, isLand);
+
+      // 5. Atmosphere Horizon Fresnel Glow
+      finalColor += fresnel * vec3(0.2, 0.75, 1.0) * 0.45;
+
+      gl_FragColor = vec4(finalColor, 0.96);
     }
   `,
 };
@@ -98,15 +110,11 @@ const RealisticOceanShader = {
 // 🛢️ 2. IRIDESCENT THIN-FILM OIL SLICK SHADER
 // ============================================================================
 const OilSlickShader = {
-  uniforms: {
-    uTime: { value: 0 },
-  },
+  uniforms: { uTime: { value: 0 } },
   vertexShader: `
-    uniform float uTime;
     varying vec3 vPosition;
     varying vec2 vUv;
     varying vec3 vNormal;
-
     void main() {
       vUv = uv;
       vNormal = normal;
@@ -119,36 +127,29 @@ const OilSlickShader = {
     varying vec3 vPosition;
     varying vec2 vUv;
     varying vec3 vNormal;
-
     void main() {
       vec3 viewDir = normalize(cameraPosition - vPosition);
       float viewAngle = max(0.0, dot(viewDir, vNormal));
-      
-      // Thin-film interference color oscillation
       float filmThickness = length(vUv - vec2(0.5)) * 10.0;
       float phase = filmThickness * 3.0 + viewAngle * 8.0 + uTime * 1.2;
 
-      vec3 c1 = vec3(0.05, 0.08, 0.12); // Dark Crude Base
-      vec3 c2 = vec3(0.26, 0.4, 0.95);  // Electric Blue Iridescence
-      vec3 c3 = vec3(0.95, 0.15, 0.55); // Magenta Rainbow Fringe
-      vec3 c4 = vec3(0.15, 0.85, 0.65); // Cyan Sheen
+      vec3 c1 = vec3(0.04, 0.06, 0.1);  // Dark Crude
+      vec3 c2 = vec3(0.2, 0.5, 0.95);   // Electric Blue
+      vec3 c3 = vec3(0.95, 0.15, 0.55);  // Magenta Sheen
+      vec3 c4 = vec3(0.1, 0.9, 0.7);    // Cyan Iridescence
 
       float t = sin(phase) * 0.5 + 0.5;
       vec3 iridColor = mix(c1, mix(c2, mix(c3, c4, sin(phase * 1.5) * 0.5 + 0.5), t), smoothstep(0.0, 0.45, length(vUv - vec2(0.5))));
-
-      float alpha = smoothstep(0.5, 0.1, length(vUv - vec2(0.5))) * 0.88;
+      float alpha = smoothstep(0.5, 0.1, length(vUv - vec2(0.5))) * 0.9;
       gl_FragColor = vec4(iridColor, alpha);
     }
   `,
 };
 
-// ============================================================================
-// 🚢 3. VESSEL DATA INTERFACE
-// ============================================================================
 interface MovingVessel {
   id: number;
   name: string;
-  type: "Tanker" | "Container" | "Bulk" | "Patrol";
+  type: string;
   mmsi: string;
   speedKnots: number;
   isSuspect?: boolean;
@@ -160,20 +161,43 @@ interface MovingVessel {
 
 export default function Globe() {
   const globeGroupRef = useRef<THREE.Group>(null);
-  const oceanShaderRef = useRef<THREE.ShaderMaterial>(null!);
+  const earthShaderRef = useRef<THREE.ShaderMaterial>(null!);
   const oilSlickShaderRef = useRef<THREE.ShaderMaterial>(null!);
   const cloudsRef = useRef<THREE.Mesh>(null);
   const radarScanRef = useRef<THREE.Group>(null);
 
-  // Memoized Uniforms
-  const oceanUniforms = useMemo(() => RealisticOceanShader.uniforms, []);
+  // Load High-Resolution NASA / Google Earth Texture Map
+  useEffect(() => {
+    const loader = new THREE.TextureLoader();
+    // Official Three.js / NASA Earth Satellite Albedo Map
+    const earthTextureUrl = "https://raw.githubusercontent.com/mrdoob/three.js/master/examples/textures/planets/earth_atmos_2048.jpg";
+
+    loader.load(
+      earthTextureUrl,
+      (texture) => {
+        texture.wrapS = THREE.RepeatWrapping;
+        texture.wrapT = THREE.ClampToEdgeWrapping;
+        if (earthShaderRef.current) {
+          earthShaderRef.current.uniforms.uEarthTexture.value = texture;
+          earthShaderRef.current.uniforms.uHasTexture.value = 1.0;
+        }
+      },
+      undefined,
+      (err) => {
+        console.warn("Failed loading external Earth texture, fallback active:", err);
+      }
+    );
+  }, []);
+
+  // Uniforms
+  const earthUniforms = useMemo(() => RealTimeEarthShader.uniforms, []);
   const oilUniforms = useMemo(() => OilSlickShader.uniforms, []);
 
-  // 🚢 Generate 32 Dynamic Moving Vessels with Realistic Orbits
+  // 🚢 Generate 32 Dynamic Ships Sailing around Earth
   const vesselFleet = useMemo(() => {
     const fleet: MovingVessel[] = [];
     const radius = 5.04;
-    const types: ("Tanker" | "Container" | "Bulk" | "Patrol")[] = ["Tanker", "Container", "Bulk", "Patrol"];
+    const types = ["Tanker", "Container", "Bulk", "Patrol"];
 
     for (let i = 0; i < 32; i++) {
       const phi = Math.acos(-1 + (2 * i) / 32);
@@ -187,10 +211,10 @@ export default function Globe() {
       const randomVec = new THREE.Vector3((Math.random() - 0.5) * 2, (Math.random() - 0.5) * 2, (Math.random() - 0.5) * 2).normalize();
       const axis = new THREE.Vector3().crossVectors(pos, randomVec).normalize();
       const speed = (0.035 + Math.random() * 0.075) * (i % 2 === 0 ? 1 : -1);
-      const isSuspect = i === 4; // Suspect Tanker linked to oil spill
+      const isSuspect = i === 4;
 
       const wakeHistory: THREE.Vector3[] = [];
-      for (let w = 0; w < 10; w++) {
+      for (let w = 0; w < 8; w++) {
         wakeHistory.push(pos.clone().applyAxisAngle(axis, -speed * w * 0.25));
       }
 
@@ -210,25 +234,10 @@ export default function Globe() {
     return fleet;
   }, []);
 
-  // 🛢️ Oil Spill Center Coordinates & Particle Drift Simulation
+  // Oil Spill Coordinates (Arabian Sea near Gulf of Oman)
   const spillCenter = useMemo(() => new THREE.Vector3(1.8, 2.3, 4.1).normalize().multiplyScalar(5.03), []);
 
-  // 40 Floating Oil Droplet Particles drifting along current
-  const oilDropletParticles = useMemo(() => {
-    const particles = [];
-    for (let i = 0; i < 45; i++) {
-      const offset = new THREE.Vector3(
-        (Math.random() - 0.5) * 0.45,
-        (Math.random() - 0.5) * 0.45,
-        (Math.random() - 0.5) * 0.45
-      );
-      const pos = spillCenter.clone().add(offset).normalize().multiplyScalar(5.045);
-      particles.push({ id: i, pos, offset, scale: 0.015 + Math.random() * 0.025 });
-    }
-    return particles;
-  }, [spillCenter]);
-
-  // AIS Trajectory Path from Suspect Ship to Slick Origin
+  // AIS Trajectory Curve from Suspect Vessel to Slick
   const aisTrajectoryCurve = useMemo(() => {
     const points: [number, number, number][] = [];
     const suspect = vesselFleet.find((v) => v.isSuspect);
@@ -248,9 +257,7 @@ export default function Globe() {
   // Latitude / Longitude Grid Rings
   const gridRings = useMemo(() => [0.25, 0.5, 0.75, -0.25, -0.5, -0.75], []);
 
-  // ============================================================================
-  // ⏱️ ANIMATION LOOP (Realistic Waves, Ship Swell Pitching, Cloud Rotation)
-  // ============================================================================
+  // Animation Loop
   useFrame((state, delta) => {
     const time = state.clock.getElapsedTime();
 
@@ -259,42 +266,29 @@ export default function Globe() {
       globeGroupRef.current.rotation.y += delta * 0.012;
     }
 
-    // 2. Update Ocean Wave Shader Uniforms
-    if (oceanShaderRef.current) {
-      oceanShaderRef.current.uniforms.uTime.value = time;
+    // 2. Update Shader Time Uniform
+    if (earthShaderRef.current) {
+      earthShaderRef.current.uniforms.uTime.value = time;
     }
-
-    // 3. Update Oil Slick Iridescence Shader
     if (oilSlickShaderRef.current) {
       oilSlickShaderRef.current.uniforms.uTime.value = time;
     }
 
-    // 4. Orbit Clouds Layer
+    // 3. Orbit Clouds
     if (cloudsRef.current) {
-      cloudsRef.current.rotation.y += delta * 0.02;
+      cloudsRef.current.rotation.y += delta * 0.018;
     }
 
-    // 5. Rotate Radar Scanner
+    // 4. Rotate Radar Beam
     if (radarScanRef.current) {
       radarScanRef.current.rotation.z = time * 1.8;
     }
 
-    // 6. Update Ship Positions & Dynamic Ocean Swell Pitch/Roll Physics
+    // 5. Update Vessels & Ocean Wave Swell Pitching
     vesselFleet.forEach((vessel) => {
-      // Advance position along spherical orbit
       vessel.position.applyAxisAngle(vessel.axis, vessel.speed * delta);
-
-      // Compute wave displacement at current ship position
-      const swellHeight =
-        Math.sin(vessel.position.x * 4.5 + time * 1.8) *
-        Math.cos(vessel.position.y * 4.5 + time * 1.4) *
-        0.048;
-
-      // Adjust ship altitude dynamically on wave crests
-      const currentRadius = 5.035 + swellHeight;
-      vessel.position.normalize().multiplyScalar(currentRadius);
-
-      // Update wake history
+      const swellHeight = Math.sin(vessel.position.x * 4.5 + time * 1.8) * Math.cos(vessel.position.y * 4.5 + time * 1.4) * 0.04;
+      vessel.position.normalize().multiplyScalar(5.035 + swellHeight);
       vessel.wakeHistory.pop();
       vessel.wakeHistory.unshift(vessel.position.clone());
     });
@@ -302,49 +296,49 @@ export default function Globe() {
 
   return (
     <group ref={globeGroupRef}>
-      {/* 🌊 Deep Core Earth Mesh */}
+      {/* 🌍 Deep Earth Inner Sphere */}
       <Sphere args={[4.96, 64, 64]}>
-        <meshStandardMaterial color="#000714" roughness={0.95} metalness={0.05} />
+        <meshStandardMaterial color="#010A14" roughness={0.95} />
       </Sphere>
 
-      {/* 🌊 Real-Time Photorealistic Wave Shader Surface */}
+      {/* 🌍 REAL-TIME GOOGLE EARTH GLOBE (Satellite Landmass + Wave Ocean Shader) */}
       <Sphere args={[5.0, 128, 128]}>
         <shaderMaterial
-          ref={oceanShaderRef}
-          args={[RealisticOceanShader]}
-          uniforms={oceanUniforms}
+          ref={earthShaderRef}
+          args={[RealTimeEarthShader]}
+          uniforms={earthUniforms}
           transparent
         />
       </Sphere>
 
-      {/* ☁️ Realistic Cloud Layer Sphere */}
+      {/* ☁️ Orbiting Atmospheric Cloud Layer */}
       <Sphere ref={cloudsRef} args={[5.08, 64, 64]}>
         <meshStandardMaterial
           color="#FFFFFF"
           transparent
-          opacity={0.12}
+          opacity={0.14}
           roughness={1.0}
           blending={THREE.AdditiveBlending}
         />
       </Sphere>
 
-      {/* 🌌 Inner Atmosphere Rayleigh Glow */}
-      <Sphere args={[5.16, 48, 48]}>
-        <meshBasicMaterial color="#00A8E8" transparent opacity={0.07} side={THREE.BackSide} />
+      {/* 🌌 Atmospheric Rayleigh Glow */}
+      <Sphere args={[5.18, 48, 48]}>
+        <meshBasicMaterial color="#00A8E8" transparent opacity={0.08} side={THREE.BackSide} />
       </Sphere>
 
-      {/* 🌌 Outer Atmospheric Rim Fresnel Glow */}
-      <Sphere args={[5.42, 32, 32]}>
+      {/* 🌌 Outer Horizon Fresnel Halo */}
+      <Sphere args={[5.44, 32, 32]}>
         <meshBasicMaterial
           color="#D4F1F9"
           transparent
-          opacity={0.08}
+          opacity={0.09}
           side={THREE.BackSide}
           blending={THREE.AdditiveBlending}
         />
       </Sphere>
 
-      {/* 🌐 Latitude / Longitude Grid Lines */}
+      {/* 🌐 Grid Lines */}
       {gridRings.map((offset, i) => (
         <group key={i}>
           <Ring
@@ -361,7 +355,7 @@ export default function Globe() {
         </group>
       ))}
 
-      {/* 🚢 REALISTIC MOVING VESSELS WITH SWELL PITCHING & BEACONS */}
+      {/* 🚢 MOVING VESSELS WITH BEACONS & WAKES */}
       {vesselFleet.map((vessel) => {
         const up = vessel.position.clone().normalize();
         const forward = new THREE.Vector3().crossVectors(vessel.axis, up).normalize();
@@ -371,9 +365,8 @@ export default function Globe() {
 
         return (
           <group key={vessel.id}>
-            {/* Vessel Group with Dynamic Orientation */}
             <group position={vessel.position} rotation={baseRotation}>
-              {/* Main Ship Hull */}
+              {/* Ship Hull */}
               <mesh position={[0, 0.012, 0]}>
                 <boxGeometry args={[0.04, 0.02, 0.09]} />
                 <meshStandardMaterial
@@ -385,13 +378,13 @@ export default function Globe() {
                 />
               </mesh>
 
-              {/* Bridge Cabin Superstructure */}
+              {/* Cabin Superstructure */}
               <mesh position={[0, 0.03, -0.02]}>
                 <boxGeometry args={[0.03, 0.022, 0.03]} />
                 <meshStandardMaterial color="#2B2D42" roughness={0.3} />
               </mesh>
 
-              {/* Navigation Light Beacons: Port (Red) & Starboard (Green) */}
+              {/* Navigation Light Beacons */}
               <mesh position={[-0.022, 0.025, 0.04]}>
                 <sphereGeometry args={[0.007, 8, 8]} />
                 <meshBasicMaterial color="#FF1E27" />
@@ -401,21 +394,7 @@ export default function Globe() {
                 <meshBasicMaterial color="#00FF66" />
               </mesh>
 
-              {/* Cargo Containers for Container Ships */}
-              {vessel.type === "Container" && !vessel.isSuspect && (
-                <group position={[0, 0.028, 0.015]}>
-                  <mesh position={[-0.01, 0, 0]}>
-                    <boxGeometry args={[0.014, 0.014, 0.035]} />
-                    <meshStandardMaterial color="#FF6B6B" />
-                  </mesh>
-                  <mesh position={[0.01, 0, 0]}>
-                    <boxGeometry args={[0.014, 0.014, 0.035]} />
-                    <meshStandardMaterial color="#4ECDC4" />
-                  </mesh>
-                </group>
-              )}
-
-              {/* Suspect Vessel Interactive HUD Telemetry Badge */}
+              {/* Suspect Target Telemetry HUD Badge */}
               {vessel.isSuspect && (
                 <Html position={[0, 0.35, 0]} center className="pointer-events-none z-30">
                   <div className="bg-[#030712]/95 border border-[#E63946]/80 backdrop-blur-lg p-2.5 rounded-md text-[10px] font-mono text-white shadow-[0_0_20px_rgba(230,57,70,0.5)] whitespace-nowrap animate-pulse">
@@ -431,7 +410,7 @@ export default function Globe() {
               )}
             </group>
 
-            {/* Dynamic Water Wake Trail Line */}
+            {/* Wake Trail Line */}
             {vessel.wakeHistory.length > 1 && (
               <Line
                 points={vessel.wakeHistory.map((p) => [p.x, p.y, p.z])}
@@ -445,9 +424,8 @@ export default function Globe() {
         );
       })}
 
-      {/* 🛢️ REAL-TIME THIN-FILM OIL SPILL DETECTION ZONE */}
+      {/* 🛢️ REAL-TIME OIL SPILL DETECTION ZONE */}
       <group position={spillCenter} lookAt={spillCenter.clone().multiplyScalar(2)}>
-        {/* Iridescent Thin-film Oil Slick Surface */}
         <mesh position={[0, 0, 0.015]}>
           <planeGeometry args={[0.7, 0.7, 32, 32]} />
           <shaderMaterial
@@ -459,13 +437,11 @@ export default function Globe() {
           />
         </mesh>
 
-        {/* Warning Perimeter Ring */}
         <mesh position={[0, 0, 0.018]}>
           <ringGeometry args={[0.38, 0.41, 64]} />
           <meshBasicMaterial color="#FF0055" transparent opacity={0.85} side={THREE.DoubleSide} />
         </mesh>
 
-        {/* Holographic SAR Radar Scan Grid Sweep */}
         <group ref={radarScanRef} position={[0, 0, 0.022]}>
           <mesh>
             <ringGeometry args={[0.02, 0.46, 48, 1, 0, Math.PI * 0.6]} />
@@ -473,7 +449,6 @@ export default function Globe() {
           </mesh>
         </group>
 
-        {/* Interactive Oil Spill Telemetry HUD Badge */}
         <Html position={[0.45, 0.45, 0]} className="pointer-events-none z-30">
           <div className="bg-[#030712]/95 border border-[#00F0FF]/80 backdrop-blur-lg p-3 rounded-md text-[10px] font-mono text-white shadow-[0_0_25px_rgba(0,240,255,0.4)] whitespace-nowrap">
             <div className="flex items-center justify-between gap-4 text-[#00F0FF] font-bold border-b border-[#00F0FF]/30 pb-1.5 mb-1.5">
@@ -488,15 +463,7 @@ export default function Globe() {
         </Html>
       </group>
 
-      {/* 🌊 Floating Oil Droplet Particles Drifting on Ocean Current */}
-      {oilDropletParticles.map((particle) => (
-        <mesh key={particle.id} position={particle.pos}>
-          <sphereGeometry args={[particle.scale, 8, 8]} />
-          <meshBasicMaterial color="#111827" transparent opacity={0.75} />
-        </mesh>
-      ))}
-
-      {/* 📈 Dynamic AIS Suspect Trajectory Line */}
+      {/* AIS Trajectory Drift Line */}
       {aisTrajectoryCurve.length > 0 && (
         <Line
           points={aisTrajectoryCurve}
