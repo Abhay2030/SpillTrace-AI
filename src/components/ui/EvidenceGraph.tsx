@@ -1,63 +1,119 @@
 "use client";
 
 import React from 'react';
-import { Network, Satellite, Droplet, Clock, Navigation } from 'lucide-react';
+import { Network, Satellite, Waves, Clock, ShieldAlert, ArrowRight, CheckCircle } from 'lucide-react';
 
 export default function EvidenceGraph() {
+  const pipelineNodes = [
+    {
+      id: 1,
+      step: 'DETECTION',
+      label: 'SAR Satellite Anomaly',
+      detail: 'Sentinel-1 SAR Radar',
+      icon: Satellite,
+      status: 'VERIFIED',
+      color: '#00F0FF',
+    },
+    {
+      id: 2,
+      step: 'HYDRODYNAMICS',
+      label: 'Drift Trajectory Rewind',
+      detail: '2.8 kts Current Model',
+      icon: Waves,
+      status: 'VERIFIED',
+      color: '#00A8E8',
+    },
+    {
+      id: 3,
+      step: 'CORRELATION',
+      label: 'AIS Vessel Intersection',
+      detail: 'Spatial/Temporal Lock',
+      icon: Clock,
+      status: 'VERIFIED',
+      color: '#FFB703',
+    },
+    {
+      id: 4,
+      step: 'ATTRIBUTION',
+      label: 'Suspect Match Found',
+      detail: 'MT ALFA SEAWAY',
+      icon: ShieldAlert,
+      status: 'HIGH CONFIDENCE',
+      color: '#FF0055',
+    },
+  ];
+
   return (
-    <div className="glass-card p-4 w-full text-[var(--text-primary)]">
-      <h3 className="font-display font-medium text-sm flex items-center gap-2 mb-4">
-        <Network size={16} className="text-[var(--accent-ocean)]" />
-        EVIDENCE GRAPH
-      </h3>
-
-      <div className="flex flex-col gap-3">
-        {/* Nodes */}
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-full bg-[var(--bg-secondary)] border border-[var(--border-medium)] flex items-center justify-center">
-            <Satellite size={14} className="text-[var(--accent-ocean)]" />
+    <div className="glass-card p-5 w-full text-[var(--text-primary)] border border-white/10 hover:border-[#00F0FF]/40 transition-all duration-300 shadow-[0_8px_32px_rgba(0,0,0,0.4)] rounded-xl">
+      {/* Header */}
+      <div className="flex items-center justify-between mb-4 border-b border-white/10 pb-3">
+        <div className="flex items-center gap-2.5">
+          <div className="w-8 h-8 rounded-lg bg-[#00F0FF]/10 border border-[#00F0FF]/30 flex items-center justify-center text-[#00F0FF]">
+            <Network size={18} />
           </div>
-          <div className="flex-1 border-b border-dashed border-[var(--border-medium)] relative">
-             <span className="absolute -top-4 left-1/2 -translate-x-1/2 text-[9px] font-mono text-[var(--text-tertiary)] bg-[var(--surface-glass)] px-1">DETECTED</span>
-          </div>
-          <div className="w-8 h-8 rounded-full bg-[var(--bg-secondary)] border border-[var(--border-medium)] flex items-center justify-center">
-             <Droplet size={14} className="text-[var(--risk-high)]" />
+          <div>
+            <h3 className="font-display font-semibold text-sm tracking-wide text-white">
+              INTELLIGENCE EVIDENCE GRAPH
+            </h3>
+            <p className="text-[10px] font-mono text-gray-400">PROVENANCE PIPELINE</p>
           </div>
         </div>
 
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-full bg-[var(--bg-secondary)] border border-[var(--border-medium)] flex items-center justify-center">
-            <Droplet size={14} className="text-[var(--risk-high)]" />
-          </div>
-          <div className="flex-1 border-b border-dashed border-[var(--border-medium)] relative">
-             <span className="absolute -top-4 left-1/2 -translate-x-1/2 text-[9px] font-mono text-[var(--text-tertiary)] bg-[var(--surface-glass)] px-1">BACKTRACK</span>
-          </div>
-          <div className="w-8 h-8 rounded-full bg-[var(--bg-secondary)] border border-[var(--border-medium)] flex items-center justify-center">
-             <Clock size={14} className="text-[var(--risk-medium)]" />
-          </div>
-        </div>
-
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-full bg-[var(--bg-secondary)] border border-[var(--border-medium)] flex items-center justify-center">
-             <Clock size={14} className="text-[var(--risk-medium)]" />
-          </div>
-          <div className="flex-1 border-b border-dashed border-[var(--border-medium)] relative">
-             <span className="absolute -top-4 left-1/2 -translate-x-1/2 text-[9px] font-mono text-[var(--text-tertiary)] bg-[var(--surface-glass)] px-1">CORRELATED</span>
-          </div>
-          <div className="w-8 h-8 rounded-full bg-[var(--bg-secondary)] border-2 border-[var(--risk-critical)] flex items-center justify-center">
-             <Navigation size={14} className="text-[var(--risk-critical)]" />
-          </div>
-        </div>
+        <span className="text-[10px] font-mono bg-[#00FF66]/10 text-[#00FF66] border border-[#00FF66]/30 px-2 py-0.5 rounded font-semibold flex items-center gap-1">
+          <CheckCircle size={11} /> 4 STAGES CHAINED
+        </span>
       </div>
-      
-      <div className="mt-6 pt-4 border-t border-[var(--border-subtle)]">
-         <div className="flex justify-between items-end">
-            <div>
-              <p className="text-xs font-mono text-[var(--text-tertiary)]">CANDIDATE 01 MATCH</p>
-              <p className="text-2xl font-display font-medium text-[var(--risk-critical)]">94.2%</p>
+
+      {/* Step Pipeline Flow */}
+      <div className="relative space-y-3 pl-2">
+        {/* Connecting Vertical Track Line */}
+        <div className="absolute left-[19px] top-4 bottom-4 w-0.5 bg-gradient-to-b from-[#00F0FF] via-[#FFB703] to-[#FF0055] opacity-60 z-0" />
+
+        {pipelineNodes.map((node) => {
+          const IconComponent = node.icon;
+          return (
+            <div key={node.id} className="relative z-10 flex items-start gap-3 bg-white/5 border border-white/10 rounded-lg p-2.5 hover:border-white/20 transition-all">
+              <div
+                className="w-8 h-8 rounded-lg shrink-0 flex items-center justify-center border shadow"
+                style={{ backgroundColor: `${node.color}15`, borderColor: `${node.color}50`, color: node.color }}
+              >
+                <IconComponent size={16} />
+              </div>
+
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center justify-between">
+                  <span className="text-[9px] font-mono font-bold tracking-wider uppercase text-gray-400">
+                    STAGE 0{node.id} // {node.step}
+                  </span>
+                  <span
+                    className="text-[9px] font-mono font-bold px-1.5 py-0.2 rounded"
+                    style={{ backgroundColor: `${node.color}20`, color: node.color }}
+                  >
+                    {node.status}
+                  </span>
+                </div>
+                <div className="text-xs font-mono font-semibold text-white truncate">{node.label}</div>
+                <div className="text-[10px] font-mono text-gray-400 truncate">{node.detail}</div>
+              </div>
             </div>
-            <button className="text-xs font-mono text-[var(--accent-ocean)] hover:underline">VIEW FULL REPORT</button>
-         </div>
+          );
+        })}
+      </div>
+
+      {/* Bottom Overall Confidence Score */}
+      <div className="mt-4 pt-3.5 border-t border-white/10 flex items-center justify-between bg-black/30 p-3 rounded-lg">
+        <div>
+          <div className="text-[10px] font-mono text-gray-400 uppercase">VERIFIED ATTRIBUTION PROBABILITY</div>
+          <div className="text-2xl font-display font-bold text-[#FF0055] tracking-tight flex items-baseline gap-1">
+            98.4%
+            <span className="text-xs font-mono text-gray-400 font-normal">HIGH CERTAINTY</span>
+          </div>
+        </div>
+
+        <button className="px-3 py-1.5 bg-[#00F0FF]/15 hover:bg-[#00F0FF]/25 border border-[#00F0FF]/40 text-[#00F0FF] text-xs font-mono font-semibold rounded-md transition-all flex items-center gap-1">
+          <span>REPORT</span>
+          <ArrowRight size={12} />
+        </button>
       </div>
     </div>
   );
