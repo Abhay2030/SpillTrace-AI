@@ -24,13 +24,13 @@ export default function Home() {
     <main className="relative w-full min-h-screen bg-[var(--bg-primary)]">
       <GlobalNavigation />
       
-      {/* 3D WebGL Background Layer (Fixed) */}
+      {/* 3D WebGL Background Layer (Fixed behind everything) */}
       <div className="fixed inset-0 z-0">
         <SceneManager />
       </div>
 
-      {/* Narrative Scroll Overlay (Absolute) */}
-      <div className="absolute inset-0 z-10">
+      {/* Narrative Scroll Overlay (Relative — drives page height) */}
+      <div className="relative z-10">
         <CinematicOverlay />
       </div>
     </main>
