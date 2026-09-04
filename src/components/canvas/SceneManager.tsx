@@ -14,10 +14,12 @@ export default function SceneManager() {
     <Canvas
       camera={{ position: [0, 0, 15], fov: 45 }}
       gl={{ antialias: true, alpha: true }}
-      style={{ background: "#02040a" }}
+      style={{ background: "transparent" }}
     >
-      <ambientLight intensity={0.5} />
-      <directionalLight position={[10, 10, 5]} intensity={1.5} />
+      {/* Bright ambient light for a daytime ocean scene */}
+      <ambientLight intensity={1.5} />
+      <directionalLight position={[10, 20, 10]} intensity={3.5} color="#ffffff" />
+      <directionalLight position={[-10, 10, -10]} intensity={1.0} color="#e0f7fa" />
       
       <CameraRig />
       

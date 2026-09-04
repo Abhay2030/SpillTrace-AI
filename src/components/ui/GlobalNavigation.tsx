@@ -3,9 +3,13 @@
 import React, { useEffect, useState } from "react";
 import { motion, useScroll } from "framer-motion";
 
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+
 export default function GlobalNavigation() {
   const { scrollYProgress } = useScroll();
   const [scrolled, setScrolled] = useState(false);
+  const pathname = usePathname();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -19,25 +23,25 @@ export default function GlobalNavigation() {
     <>
       {/* Top Navigation */}
       <motion.nav 
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${scrolled ? 'bg-[#0A0A0A]/80 backdrop-blur-md py-4 border-b border-[var(--border-subtle)]' : 'bg-transparent py-6'}`}
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${scrolled ? 'bg-[var(--surface-glass)] backdrop-blur-md py-4 border-b border-[var(--border-subtle)] shadow-[var(--shadow-elegant)]' : 'bg-transparent py-6'}`}
       >
         <div className="max-w-[1400px] mx-auto px-8 flex items-center justify-between">
-          <div className="flex items-center gap-2">
+          <Link href="/" className="flex items-center gap-2">
             <div className="w-2 h-2 rounded-full bg-[var(--accent-cyan)] animate-pulse" />
-            <span className="text-white font-display font-medium tracking-widest text-sm">SPILLTRACE AI</span>
-          </div>
+            <span className="text-[var(--text-primary)] font-display font-medium tracking-widest text-sm">SPILLTRACE AI</span>
+          </Link>
           
           <div className="hidden md:flex items-center gap-8 text-[10px] font-mono tracking-[0.2em] text-[var(--text-secondary)]">
-            <a href="#" className="hover:text-white transition-colors">INVESTIGATE</a>
-            <a href="#" className="hover:text-white transition-colors">ANALYTICS</a>
-            <a href="#" className="hover:text-white transition-colors">RESPONSE</a>
-            <a href="#" className="hover:text-white transition-colors">ABOUT</a>
+            <Link href="/investigate" className={`hover:text-[var(--accent-ocean)] transition-colors ${pathname === '/investigate' ? 'text-[var(--accent-ocean)] font-bold' : ''}`}>INVESTIGATE</Link>
+            <Link href="/analytics" className={`hover:text-[var(--accent-ocean)] transition-colors ${pathname === '/analytics' ? 'text-[var(--accent-ocean)] font-bold' : ''}`}>ANALYTICS</Link>
+            <Link href="/response" className={`hover:text-[var(--accent-ocean)] transition-colors ${pathname === '/response' ? 'text-[var(--accent-ocean)] font-bold' : ''}`}>RESPONSE</Link>
+            <Link href="/about" className={`hover:text-[var(--accent-ocean)] transition-colors ${pathname === '/about' ? 'text-[var(--accent-ocean)] font-bold' : ''}`}>ABOUT</Link>
           </div>
 
           <div>
-            <button className="text-[10px] font-mono tracking-widest px-4 py-2 border border-[var(--border-subtle)] text-white hover:bg-[var(--bg-secondary)] transition-colors rounded">
+            <Link href="/investigate" className="btn-primary">
               START INVESTIGATION
-            </button>
+            </Link>
           </div>
         </div>
       </motion.nav>

@@ -2,32 +2,43 @@
 @import "tailwindcss";
 
 /* ============================================
-   SPILLTRACE AI — DESIGN SYSTEM (v3)
-   Premium Simplicity / Editorial Quality
+   SPILLTRACE AI — DESIGN SYSTEM (v4)
+   Premium Light / Maritime Intelligence
    ============================================ */
 
 /* --- Root Variables --- */
 :root {
-  --bg-primary: #0A0A0A;
-  --bg-secondary: #121212;
-  --bg-tertiary: #1A1A1A;
-  --bg-elevated: #242424;
+  /* Bright Backgrounds */
+  --bg-primary: #FFFFFF;
+  --bg-secondary: #F7FAFC; /* Very light blue-gray */
+  --bg-tertiary: #EDF2F7;
+  
+  /* Glass Surfaces */
+  --surface-glass: rgba(255, 255, 255, 0.85);
+  --surface-hover: rgba(247, 250, 252, 0.95);
 
-  --accent-cyan: #00E5FF; /* Single primary accent */
-  
-  /* Risk colors strictly for risk states */
-  --accent-amber: #F5A623;
-  --accent-red: #FF3B30;
-  
-  --text-primary: #F2F2F2;
-  --text-secondary: #A1A1AA;
-  --text-tertiary: #71717A;
-  --text-muted: #52525B;
+  /* Deep Navy Text */
+  --text-primary: #0A192F;
+  --text-secondary: #334155;
+  --text-tertiary: #64748B;
+  --text-inverse: #FFFFFF;
 
-  --border-subtle: rgba(255, 255, 255, 0.08);
-  --border-medium: rgba(255, 255, 255, 0.15);
+  /* Maritime Accents */
+  --accent-cyan: #00B4D8;
+  --accent-ocean: #0077B6;
+  --accent-navy: #023E8A;
   
-  --glow-subtle: 0 4px 20px rgba(0, 0, 0, 0.5);
+  /* Risk Indicators */
+  --risk-critical: #E63946;
+  --risk-high: #F59E0B;
+  --risk-medium: #FCD34D;
+  --risk-low: #10B981; /* Success/Safe */
+
+  /* Borders & Shadows */
+  --border-subtle: rgba(10, 25, 47, 0.08);
+  --border-medium: rgba(10, 25, 47, 0.15);
+  --shadow-elegant: 0 10px 30px rgba(10, 25, 47, 0.05);
+  --shadow-floating: 0 20px 40px rgba(10, 25, 47, 0.08);
 }
 
 /* --- Base Reset --- */
@@ -39,7 +50,7 @@
 
 html {
   scroll-behavior: smooth;
-  overflow: hidden;
+  overflow-x: hidden;
 }
 
 body {
@@ -48,9 +59,8 @@ body {
   color: var(--text-primary);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  overflow: hidden;
-  height: 100vh;
-  width: 100vw;
+  overflow-x: hidden;
+  min-height: 100vh;
 }
 
 /* --- Typography --- */
@@ -63,105 +73,101 @@ body {
   letter-spacing: -0.02em;
 }
 
-/* --- Panels & Cards (Minimalist) --- */
+h1, h2, h3, h4 {
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+}
+
+/* --- Panels & Cards (Premium Light) --- */
 .glass-card {
-  background: var(--bg-secondary);
+  background: var(--surface-glass);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   border: 1px solid var(--border-subtle);
-  border-radius: 8px;
+  border-radius: 12px;
   transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-  box-shadow: var(--glow-subtle);
+  box-shadow: var(--shadow-elegant);
 }
 
 .glass-card:hover {
   border-color: var(--border-medium);
-  background: var(--bg-tertiary);
+  background: var(--surface-hover);
+  box-shadow: var(--shadow-floating);
 }
 
 .glass-panel {
-  background: transparent;
+  background: var(--bg-secondary);
   border: 1px solid var(--border-subtle);
-  border-radius: 8px;
+  border-radius: 12px;
 }
 
-/* --- Typography Focus --- */
-h1, h2, h3, h4 {
-  font-weight: 500;
-  letter-spacing: -0.02em;
+/* --- Buttons --- */
+.btn-primary {
+  background: var(--accent-ocean);
+  color: var(--text-inverse);
+  padding: 0.75rem 1.5rem;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  transition: all 0.2s ease;
+  border: 1px solid transparent;
 }
 
-/* --- Score Bar (Solid, Minimal) --- */
-.score-bar {
-  height: 4px;
-  border-radius: 2px;
-  background: var(--bg-elevated);
-  overflow: hidden;
+.btn-primary:hover {
+  background: var(--accent-navy);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(2, 62, 138, 0.2);
 }
 
-.score-bar-fill {
-  height: 100%;
-  border-radius: 2px;
-  background: var(--accent-cyan);
-  transition: width 1s cubic-bezier(0.16, 1, 0.3, 1);
+.btn-secondary {
+  background: transparent;
+  color: var(--text-primary);
+  padding: 0.75rem 1.5rem;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  transition: all 0.2s ease;
+  border: 1px solid var(--border-medium);
 }
 
-/* --- Scrollbar (Invisible/Minimal) --- */
+.btn-secondary:hover {
+  background: var(--bg-secondary);
+  border-color: var(--text-primary);
+}
+
+/* --- Scrollbar (Elegant) --- */
 ::-webkit-scrollbar {
-  width: 4px;
+  width: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: transparent;
+  background: var(--bg-secondary);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--bg-elevated);
-  border-radius: 2px;
+  background: var(--text-tertiary);
+  border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--text-tertiary);
+  background: var(--text-secondary);
 }
 
 /* --- Selection --- */
 ::selection {
-  background: rgba(0, 229, 255, 0.2);
-  color: white;
+  background: rgba(0, 180, 216, 0.2);
+  color: var(--accent-navy);
 }
 
-/* --- Slide Transitions (Calm, Editorial) --- */
-.slide-enter {
-  opacity: 0;
-  transform: translateY(10px);
-}
-
-.slide-enter-active {
-  opacity: 1;
-  transform: translateY(0);
-  transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.slide-exit {
-  opacity: 1;
-}
-
-.slide-exit-active {
-  opacity: 0;
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-/* --- Gradient Text (Restrained) --- */
-.gradient-text {
-  background: linear-gradient(135deg, #FFFFFF, #A1A1AA);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-.text-cyan {
-  color: var(--accent-cyan);
-}
-
-/* --- Risk Level Colors --- */
-.risk-critical { color: var(--accent-red); }
-.risk-high { color: var(--accent-amber); }
-.risk-low { color: var(--text-secondary); }
+/* --- Risk Colors --- */
+.text-critical { color: var(--risk-critical); }
+.text-high { color: var(--risk-high); }
+.text-medium { color: var(--risk-medium); }
+.text-low { color: var(--risk-low); }
+.text-cyan { color: var(--accent-cyan); }
+.text-ocean { color: var(--accent-ocean); }
