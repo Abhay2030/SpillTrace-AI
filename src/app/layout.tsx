@@ -3,7 +3,7 @@ import "./globals.css";
 import CommandPalette from "@/components/ui/CommandPalette";
 
 export const metadata: Metadata = {
-  title: "SpillTrace AI — From Space to Suspect | Ministry of Disaster Management",
+  title: "SpillTrace AI — From Space to Suspect | SIH 2026",
   description:
     "AI-Powered Maritime Oil Spill Forensics, Attribution & Response Intelligence Platform. Detect, trace, attribute, assess, respond, and monitor oil spills using satellite intelligence, AI computer vision, oceanographic modelling, and AIS vessel analytics.",
   keywords: [
@@ -15,8 +15,8 @@ export const metadata: Metadata = {
     "oil spill forensics",
     "SAR imagery",
     "ocean drift modelling",
-    "Ministry of Disaster Management",
-    "Disaster Management",
+    "Smart India Hackathon",
+    "SIH 2026",
     "NTRO",
     "SpillTrace AI",
   ],
