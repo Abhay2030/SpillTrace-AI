@@ -33,22 +33,22 @@ export default function InvestigatePage() {
           
           {/* Main Board Command Banner Header */}
           <div className="glass-card p-4 sticky top-0 z-20 bg-[#050B14]/95 backdrop-blur-xl border border-white/15 rounded-xl shadow-[0_8px_32px_rgba(0,0,0,0.5)]">
-            <div className="flex items-center justify-between border-b border-white/10 pb-3 mb-2.5">
-              <div className="flex items-center gap-3">
-                <img src="/logo.png" alt="SpillTrace AI Logo" className="h-10 w-auto object-contain filter drop-shadow-[0_0_12px_rgba(0,240,255,0.4)]" />
-                <div>
-                  <h2 className="font-display font-bold text-base leading-tight text-white flex items-center gap-1.5">
+            <div className="flex items-center justify-between gap-2 border-b border-white/10 pb-3 mb-2.5">
+              <div className="flex items-center gap-2.5 min-w-0">
+                <img src="/logo.png" alt="SpillTrace AI Logo" className="h-9 w-auto shrink-0 object-contain filter drop-shadow-[0_0_12px_rgba(0,240,255,0.4)]" />
+                <div className="min-w-0">
+                  <h2 className="font-display font-bold text-sm sm:text-base leading-tight text-white flex items-center gap-1.5 truncate">
                     COMMAND BOARD
-                    <span className="text-[9px] font-mono bg-[#00F0FF]/15 text-[#00F0FF] border border-[#00F0FF]/30 px-1.5 py-0.2 rounded">LIVE</span>
+                    <span className="text-[9px] font-mono bg-[#00F0FF]/15 text-[#00F0FF] border border-[#00F0FF]/30 px-1.5 py-0.5 rounded shrink-0">LIVE</span>
                   </h2>
-                  <p className="text-[10px] font-mono text-gray-400">SPILL DETECTED // INCIDENT #8941</p>
+                  <p className="text-[10px] font-mono text-gray-400 truncate">SPILL DETECTED // INCIDENT #8941</p>
                 </div>
               </div>
 
-              <div className="text-right">
+              <div className="text-right shrink-0">
                 <span className="text-xs font-mono font-bold text-[#FF0055] bg-[#FF0055]/15 border border-[#FF0055]/30 px-2 py-1 rounded-md flex items-center gap-1">
-                  <Activity size={12} className="animate-pulse" />
-                  HIGH RISK
+                  <Activity size={12} className="animate-pulse shrink-0" />
+                  <span className="whitespace-nowrap">HIGH RISK</span>
                 </span>
               </div>
             </div>

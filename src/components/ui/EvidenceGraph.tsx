@@ -81,12 +81,12 @@ export default function EvidenceGraph() {
               </div>
 
               <div className="flex-1 min-w-0">
-                <div className="flex items-center justify-between">
-                  <span className="text-[9px] font-mono font-bold tracking-wider uppercase text-gray-400">
+                <div className="flex items-center justify-between gap-2">
+                  <span className="text-[9px] font-mono font-bold tracking-wider uppercase text-gray-400 truncate">
                     STAGE 0{node.id} // {node.step}
                   </span>
                   <span
-                    className="text-[9px] font-mono font-bold px-1.5 py-0.2 rounded"
+                    className="text-[9px] font-mono font-bold px-1.5 py-0.2 rounded shrink-0 whitespace-nowrap"
                     style={{ backgroundColor: `${node.color}20`, color: node.color }}
                   >
                     {node.status}

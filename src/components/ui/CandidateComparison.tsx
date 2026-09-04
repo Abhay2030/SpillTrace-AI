@@ -31,24 +31,24 @@ export default function CandidateComparison() {
       <div className="space-y-3.5">
         {/* Candidate A (The High-Confidence Suspect) */}
         <div className="relative rounded-xl border-2 border-[#FF0055] p-4 bg-[#FF0055]/10 shadow-[0_0_20px_rgba(255,0,85,0.2)]">
-          <div className="flex items-center justify-between mb-2">
-            <div className="flex items-center gap-2">
-              <div className="w-6 h-6 rounded bg-[#FF0055] text-white flex items-center justify-center font-bold text-xs">
+          <div className="flex items-center justify-between mb-2 gap-2">
+            <div className="flex items-center gap-2 min-w-0">
+              <div className="w-6 h-6 rounded bg-[#FF0055] text-white flex items-center justify-center font-bold text-xs shrink-0">
                 #1
               </div>
-              <div>
-                <div className="font-mono font-bold text-sm text-white flex items-center gap-1.5">
+              <div className="min-w-0">
+                <div className="font-mono font-bold text-xs sm:text-sm text-white flex items-center gap-1.5 truncate">
                   {suspect.vesselName}
-                  <span className="text-[9px] font-mono bg-[#FF0055] text-white font-bold px-1.5 py-0.2 rounded">TARGET</span>
+                  <span className="text-[9px] font-mono bg-[#FF0055] text-white font-bold px-1.5 py-0.2 rounded shrink-0">TARGET</span>
                 </div>
-                <div className="text-[10px] font-mono text-gray-300">
+                <div className="text-[10px] font-mono text-gray-300 truncate">
                   {suspect.imo} | {suspect.vesselTypeGroup}
                 </div>
               </div>
             </div>
             
-            <div className="text-right">
-              <div className="text-lg font-display font-bold text-[#FF0055]">{suspect.candidateScore}%</div>
+            <div className="text-right shrink-0">
+              <div className="text-base sm:text-lg font-display font-bold text-[#FF0055]">{suspect.candidateScore}%</div>
               <div className="text-[9px] font-mono text-gray-400">MATCH SCORE</div>
             </div>
           </div>
