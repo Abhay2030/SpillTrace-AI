@@ -29,7 +29,7 @@ export default function SceneManager() {
       <Incident />
       <DataVisualization />
       
-      <Environment preset="night" />
+      <Environment preset="sunset" />
     </Canvas>
   );
 }
