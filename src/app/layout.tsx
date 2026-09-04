@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import CommandPalette from "@/components/ui/CommandPalette";
 
 export const metadata: Metadata = {
   title: "SpillTrace AI — From Space to Suspect | SIH 2026",
@@ -43,7 +44,10 @@ export default function RootLayout({
           crossOrigin="anonymous"
         />
       </head>
-      <body className="antialiased">{children}</body>
+      <body className="antialiased">
+        {children}
+        <CommandPalette />
+      </body>
     </html>
   );
 }

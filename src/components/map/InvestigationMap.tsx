@@ -1,26 +1,116 @@
 "use client";
 
-import React, { useState } from 'react';
-import Map, { NavigationControl, FullscreenControl, ScaleControl } from 'react-map-gl/maplibre';
+import React, { useState, useEffect, useRef } from 'react';
+import Map, { NavigationControl, ScaleControl, Source, Layer, MapRef } from 'react-map-gl/maplibre';
 import 'maplibre-gl/dist/maplibre-gl.css';
-import { useInvestigationStore } from '@/store/investigationStore';
-import { Layers, Maximize, Minus, Plus, Compass } from 'lucide-react';
+import { useInvestigationStore, InvestigationStep } from '@/store/investigationStore';
+import { Layers } from 'lucide-react';
+import { mockIncident, mockVessels } from '@/data/mockProviders';
+
+// MapLibre Layer Styles
+const spillLayerStyle = {
+  id: 'spill-area',
+  type: 'fill' as const,
+  paint: {
+    'fill-color': '#e11d48', // var(--risk-critical)
+    'fill-opacity': 0.4,
+    'fill-outline-color': '#be123c'
+  }
+};
+
+const vesselLayerStyle = {
+  id: 'vessels-point',
+  type: 'circle' as const,
+  paint: {
+    'circle-radius': 4,
+    'circle-color': [
+      'match',
+      ['get', 'id'],
+      'VESSEL-82A', '#e11d48', // Critical
+      'VESSEL-41C', '#94a3b8', // Eliminated
+      '#0ea5e9' // Default
+    ],
+    'circle-stroke-width': 1,
+    'circle-stroke-color': '#ffffff'
+  }
+};
+
+// Coordinate configurations for camera choreography
+const STEP_CAMERAS: Record<InvestigationStep, { center: [number, number], zoom: number, pitch: number }> = {
+  '01-DETECT': { center: [65.0, 15.0], zoom: 4, pitch: 0 },
+  '02-CHARACTERIZE': { center: mockIncident.center, zoom: 11, pitch: 30 },
+  '03-TRACE': { center: mockIncident.center, zoom: 10, pitch: 45 },
+  '04-CORRELATE': { center: mockIncident.center, zoom: 8, pitch: 20 },
+  '05-ATTRIBUTE': { center: mockIncident.center, zoom: 12, pitch: 60 },
+  '06-EXPLAIN': { center: mockIncident.center, zoom: 12, pitch: 60 },
+  '07-ASSESS': { center: [65.5, 15.2], zoom: 9, pitch: 45 },
+  '08-RESPOND': { center: [65.5, 15.2], zoom: 9, pitch: 45 },
+  '09-MONITOR': { center: [65.0, 15.0], zoom: 5, pitch: 0 },
+};
 
 export default function InvestigationMap() {
-  const { mapMode, setMapMode } = useInvestigationStore();
+  const { mapMode, setMapMode, currentStep } = useInvestigationStore();
   const [showLayerMenu, setShowLayerMenu] = useState(false);
+  const mapRef = useRef<MapRef>(null);
 
   // Default to a generic dark/satellite hybrid map style for maritime data
-  // In a real app, you would swap these URLs based on the mapMode
   const mapStyleUrl = mapMode === 'SATELLITE' || mapMode === 'HYBRID' 
-    ? "https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json" // Placeholder for actual satellite
+    ? "https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json"
     : "https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json";
+
+  // Handle Camera Choreography
+  useEffect(() => {
+    if (mapRef.current) {
+      const camera = STEP_CAMERAS[currentStep];
+      mapRef.current.flyTo({
+        center: camera.center,
+        zoom: camera.zoom,
+        pitch: camera.pitch,
+        duration: 2000, // Cinematic 2-second transition
+        essential: true
+      });
+    }
+  }, [currentStep]);
+
+  // GeoJSON for Spill Polygon (Simulated as a simple circle polygon around center)
+  const spillGeojson = {
+    type: 'FeatureCollection',
+    features: [
+      {
+        type: 'Feature',
+        geometry: {
+          type: 'Polygon',
+          coordinates: [[
+            [mockIncident.center[0] - 0.05, mockIncident.center[1] - 0.05],
+            [mockIncident.center[0] + 0.05, mockIncident.center[1] - 0.05],
+            [mockIncident.center[0] + 0.05, mockIncident.center[1] + 0.05],
+            [mockIncident.center[0] - 0.05, mockIncident.center[1] + 0.05],
+            [mockIncident.center[0] - 0.05, mockIncident.center[1] - 0.05]
+          ]]
+        },
+        properties: { id: mockIncident.id }
+      }
+    ]
+  };
+
+  // GeoJSON for Vessels
+  const vesselsGeojson = {
+    type: 'FeatureCollection',
+    features: mockVessels.map(v => ({
+      type: 'Feature',
+      geometry: { type: 'Point', coordinates: v.position },
+      properties: { id: v.id, type: v.type }
+    }))
+  };
+
+  const showVessels = ['04-CORRELATE', '05-ATTRIBUTE', '06-EXPLAIN'].includes(currentStep);
 
   return (
     <div className="relative w-full h-full rounded-xl overflow-hidden border border-[var(--border-subtle)] shadow-[var(--shadow-elegant)]">
       <Map
+        ref={mapRef}
         initialViewState={{
-          longitude: 65.0, // Arabian Sea
+          longitude: 65.0,
           latitude: 15.0,
           zoom: 4,
           pitch: 45
@@ -33,7 +123,6 @@ export default function InvestigationMap() {
 
         {/* Custom Map Controls Layer */}
         <div className="absolute top-4 right-4 flex flex-col gap-2">
-          
           {/* Map Mode Switcher */}
           <div className="relative">
             <button 
@@ -65,11 +154,21 @@ export default function InvestigationMap() {
               </div>
             )}
           </div>
-
         </div>
         
-        {/* Placeholder for Data Layers (Polygons, Lines, Instances) */}
-        {/* <Source id="spill-polygon" type="geojson" data={...}> ... </Source> */}
+        {/* Data Layers */}
+        {/* @ts-expect-error valid geojson structure */}
+        <Source id="spill-source" type="geojson" data={spillGeojson}>
+           <Layer {...spillLayerStyle} />
+        </Source>
+
+        {showVessels && (
+          // @ts-expect-error valid geojson structure
+          <Source id="vessels-source" type="geojson" data={vesselsGeojson}>
+            {/* @ts-expect-error valid maplibre style */}
+            <Layer {...vesselLayerStyle} />
+          </Source>
+        )}
       </Map>
     </div>
   );
