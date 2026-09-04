@@ -43,12 +43,12 @@ export default function GlobalNavigation() {
               <img 
                 src="/logo.png" 
                 alt="SpillTrace AI Logo" 
-                className="h-8 w-auto object-contain rounded transition-transform group-hover:scale-105" 
+                className="h-9 w-auto object-contain transition-transform group-hover:scale-105 filter drop-shadow-[0_0_10px_rgba(0,240,255,0.4)]" 
               />
               <div className={`absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full ${isLive ? 'bg-[var(--risk-critical)]' : 'bg-[var(--accent-cyan)]'} animate-pulse`} />
             </div>
-            <span className="text-[var(--text-primary)] font-display font-medium tracking-widest text-sm group-hover:text-[var(--accent-ocean)] transition-colors">
-              SPILLTRACE AI
+            <span className="text-[var(--text-primary)] font-display font-bold tracking-widest text-base group-hover:text-[#00F0FF] transition-colors">
+              SPILLTRACE <span className="text-[#00F0FF]">AI</span>
             </span>
           </Link>
           

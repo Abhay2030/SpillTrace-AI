@@ -35,7 +35,7 @@ export default function InvestigatePage() {
           <div className="glass-card p-4 sticky top-0 z-20 bg-[#050B14]/95 backdrop-blur-xl border border-white/15 rounded-xl shadow-[0_8px_32px_rgba(0,0,0,0.5)]">
             <div className="flex items-center justify-between border-b border-white/10 pb-3 mb-2.5">
               <div className="flex items-center gap-3">
-                <img src="/logo.png" alt="SpillTrace AI Logo" className="h-9 w-auto object-contain" />
+                <img src="/logo.png" alt="SpillTrace AI Logo" className="h-10 w-auto object-contain filter drop-shadow-[0_0_12px_rgba(0,240,255,0.4)]" />
                 <div>
                   <h2 className="font-display font-bold text-base leading-tight text-white flex items-center gap-1.5">
                     COMMAND BOARD
