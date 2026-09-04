@@ -4,36 +4,93 @@ import React, { useEffect, useRef } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Link from "next/link";
-import { Satellite, Droplets, Ship, Search, ShieldAlert, Brain, Activity, Radio } from "lucide-react";
+import Image from "next/image";
+import { Satellite, Droplets, Ship, Search, ShieldAlert, Brain, Activity, Radio, ChevronDown } from "lucide-react";
 
 gsap.registerPlugin(ScrollTrigger);
 
+const images = {
+  hero: "/assets/images/hero_ocean_spill_1788527688574.png",
+  detect: "/assets/images/detect_sar_imagery_1788527705067.png",
+  trace: "/assets/images/trace_currents_viz_1788527721432.png",
+  correlate: "/assets/images/correlate_traffic_map_1788528008902.png",
+  attribute: "/assets/images/suspect_vessel_1788528074308.png",
+  explain: "/assets/images/suspect_vessel_1788528074308.png", // Reuse suspect vessel for explain, or keep it dark
+  assess: "/assets/images/threat_coastal_1788528093544.png",
+  respond: "/assets/images/response_operation_1788528110944.png",
+  monitor: "/assets/images/detect_sar_imagery_1788527705067.png", // Satellite monitoring again
+  final: "/assets/images/clean_ocean_horizon_1788528135740.png"
+};
+
 export default function CinematicOverlay() {
   const containerRef = useRef<HTMLDivElement>(null);
+  const bgRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    // Hide the 3D globe canvas to allow images to show through perfectly
+    const canvas = document.querySelector('canvas');
+    if (canvas) {
+        gsap.set(canvas, { opacity: 0 });
+    }
+
     const ctx = gsap.context(() => {
+      // 1. Content Fade Ins
       const panels = gsap.utils.toArray(".chapter-panel") as HTMLElement[];
       panels.forEach((panel) => {
         gsap.fromTo(
           panel.querySelector(".content"),
           { opacity: 0, y: 60 },
           {
-            opacity: 1, y: 0, duration: 1.2,
-            scrollTrigger: { trigger: panel, start: "top 70%", end: "top 30%", scrub: 1 },
+            opacity: 1, y: 0, duration: 1.2, ease: "power2.out",
+            scrollTrigger: { trigger: panel, start: "top 65%", end: "top 25%", scrub: 1 },
           }
         );
       });
 
-      // Animate counters
+      // 2. Animated Counters
       gsap.utils.toArray(".count-up").forEach((el) => {
         const target = el as HTMLElement;
         const end = parseFloat(target.dataset.value || "0");
         gsap.fromTo(target, { innerText: "0" }, {
-          innerText: end, duration: 2, snap: { innerText: end % 1 === 0 ? 1 : 0.1 },
-          scrollTrigger: { trigger: target, start: "top 80%", toggleActions: "play none none none" },
+          innerText: end, duration: 2, ease: "power2.out", snap: { innerText: end % 1 === 0 ? 1 : 0.1 },
+          scrollTrigger: { trigger: target, start: "top 85%", toggleActions: "play none none none" },
         });
       });
+
+      // 3. Background Image Crossfades (Cinematic Sequencing)
+      const bgs = gsap.utils.toArray(".bg-layer") as HTMLElement[];
+      
+      // Initially, hero is visible
+      gsap.set(bgs[0], { opacity: 1, scale: 1 });
+      gsap.set(bgs.slice(1), { opacity: 0, scale: 1.1 });
+
+      panels.forEach((panel, i) => {
+        if (i === 0) return; // Skip hero
+        
+        // When panel i enters, fade out panel i-1 background and fade in panel i background
+        ScrollTrigger.create({
+          trigger: panel,
+          start: "top 60%", // When the new section is starting to come in
+          end: "top 10%",
+          scrub: true,
+          animation: gsap.timeline()
+            .to(bgs[i-1], { opacity: 0, scale: 1.05, duration: 1 }, 0)
+            .to(bgs[i], { opacity: 1, scale: 1, duration: 1 }, 0)
+        });
+      });
+
+      // Subtle continuous pan/zoom on backgrounds to make them feel alive
+      bgs.forEach(bg => {
+        gsap.to(bg.querySelector('img'), {
+          scale: 1.05,
+          xPercent: -1,
+          duration: 20,
+          repeat: -1,
+          yoyo: true,
+          ease: "sine.inOut"
+        });
+      });
+
     }, containerRef);
     return () => ctx.revert();
   }, []);
@@ -41,296 +98,354 @@ export default function CinematicOverlay() {
   return (
     <div ref={containerRef} className="relative w-full z-10 pointer-events-none">
       
-      {/* ===== HERO ===== */}
-      <section className="chapter-panel h-[150vh] flex items-center px-8 md:px-20">
-        <div className="content pointer-events-auto max-w-3xl">
-          <div className="flex items-center gap-4 mb-6">
-            <img src="/logo.png" alt="SpillTrace AI Logo" className="h-16 md:h-20 w-auto object-contain drop-shadow-[0_0_25px_rgba(0,180,216,0.4)]" />
-            <div className="flex items-center gap-2">
-              <span className="threat-badge low">SIH 2026</span>
-              <span className="threat-badge" style={{background:'rgba(0,119,182,0.08)',color:'var(--accent-ocean)',border:'1px solid rgba(0,119,182,0.15)'}}>NTRO</span>
-              <span className="threat-badge" style={{background:'rgba(0,180,216,0.08)',color:'var(--accent-cyan)',border:'1px solid rgba(0,180,216,0.15)'}}>SENTINEL-1</span>
-            </div>
-          </div>
-          <p className="text-xs font-mono text-[var(--accent-ocean)] tracking-[0.3em] mb-3 uppercase">Anomaly Detected</p>
-          <h1 className="text-6xl md:text-8xl font-display font-bold text-[var(--text-primary)] mb-3 tracking-tight leading-[0.95]">
-            SPILLTRACE<br/><span className="gradient-text">AI</span>
-          </h1>
-          <p className="text-xl md:text-2xl text-[var(--text-secondary)] font-light max-w-lg mb-10">
-            From Space to Suspect.
-          </p>
-          <div className="flex gap-4 mb-12">
-            <Link href="/investigate" className="btn-primary">Start Investigation</Link>
-            <Link href="/about" className="btn-secondary">Explore the System</Link>
-          </div>
+      {/* ===== FIXED CINEMATIC BACKGROUNDS ===== */}
+      <div ref={bgRef} className="fixed inset-0 z-0 bg-[#0A0A0A]">
+        {/* Layer 0: Hero */}
+        <div className="bg-layer absolute inset-0"><Image src={images.hero} alt="Ocean Spill" fill className="object-cover opacity-60" priority /></div>
+        {/* Layer 1: Detect */}
+        <div className="bg-layer absolute inset-0"><Image src={images.detect} alt="SAR Imagery" fill className="object-cover opacity-60" /></div>
+        {/* Layer 2: Trace */}
+        <div className="bg-layer absolute inset-0"><Image src={images.trace} alt="Currents" fill className="object-cover opacity-60" /></div>
+        {/* Layer 3: Correlate */}
+        <div className="bg-layer absolute inset-0"><Image src={images.correlate} alt="Traffic Map" fill className="object-cover opacity-60" /></div>
+        {/* Layer 4: Attribute */}
+        <div className="bg-layer absolute inset-0"><Image src={images.attribute} alt="Suspect Vessel" fill className="object-cover opacity-50" /></div>
+        {/* Layer 5: Explain */}
+        <div className="bg-layer absolute inset-0"><Image src={images.explain} alt="Analysis" fill className="object-cover opacity-30" /></div>
+        {/* Layer 6: Assess */}
+        <div className="bg-layer absolute inset-0"><Image src={images.assess} alt="Coastal Threat" fill className="object-cover opacity-60" /></div>
+        {/* Layer 7: Respond */}
+        <div className="bg-layer absolute inset-0"><Image src={images.respond} alt="Response" fill className="object-cover opacity-60" /></div>
+        {/* Layer 8: Monitor */}
+        <div className="bg-layer absolute inset-0"><Image src={images.monitor} alt="Monitoring" fill className="object-cover opacity-40" /></div>
+        {/* Layer 9: Final Hero */}
+        <div className="bg-layer absolute inset-0"><Image src={images.final} alt="Clean Ocean" fill className="object-cover opacity-80" /></div>
+        
+        {/* Global Dark Vignette for Text Readability */}
+        <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-black/20" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-black/40" />
+      </div>
 
-          {/* Trust Metrics */}
-          <div className="flex gap-8 text-center">
-            <div><p className="text-2xl font-bold font-display text-[var(--text-primary)]">247</p><p className="text-[10px] font-mono text-[var(--text-tertiary)] tracking-widest">VESSELS ANALYZED</p></div>
-            <div className="w-px bg-[var(--border-subtle)]" />
-            <div><p className="text-2xl font-bold font-display text-[var(--risk-critical)]">94.2%</p><p className="text-[10px] font-mono text-[var(--text-tertiary)] tracking-widest">CONFIDENCE</p></div>
-            <div className="w-px bg-[var(--border-subtle)]" />
-            <div><p className="text-2xl font-bold font-display text-[var(--text-primary)]">8.4 km²</p><p className="text-[10px] font-mono text-[var(--text-tertiary)] tracking-widest">SPILL AREA</p></div>
-          </div>
+      {/* ===== SCROLLING CONTENT OVERLAYS ===== */}
+      <div className="relative z-10 text-white">
+        
+        {/* ===== HERO ===== */}
+        <section className="chapter-panel h-[150vh] flex items-center px-8 md:px-24">
+          <div className="content pointer-events-auto max-w-3xl">
+            <div className="flex items-center gap-4 mb-6">
+              <img src="/logo.png" alt="SpillTrace AI Logo" className="h-16 md:h-20 w-auto object-contain drop-shadow-[0_0_25px_rgba(0,180,216,0.4)]" />
+              <div className="flex items-center gap-2">
+                <span className="threat-badge low bg-[#10B981]/20 border-[#10B981]/40 backdrop-blur-sm">SIH 2026</span>
+                <span className="threat-badge bg-[#0077B6]/20 border-[#0077B6]/40 text-[#00B4D8] backdrop-blur-sm">NTRO</span>
+                <span className="threat-badge bg-[#00B4D8]/20 border-[#00B4D8]/40 text-[#CAF0F8] backdrop-blur-sm">SENTINEL-1</span>
+              </div>
+            </div>
+            <p className="text-xs font-mono text-[#00B4D8] tracking-[0.3em] mb-4 uppercase drop-shadow-md">Critical Anomaly Detected</p>
+            <h1 className="text-7xl md:text-9xl font-display font-bold text-white mb-4 tracking-tight leading-[0.9] drop-shadow-2xl">
+              SPILLTRACE<br/><span className="text-transparent bg-clip-text bg-gradient-to-r from-[#00B4D8] to-[#90E0EF]">AI</span>
+            </h1>
+            <p className="text-2xl text-gray-300 font-light max-w-lg mb-12 drop-shadow-md leading-relaxed">
+              From Space to Suspect.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 mb-16">
+              <Link href="/investigate" className="btn-primary flex items-center justify-center bg-[#0077B6] hover:bg-[#023E8A] border border-[#00B4D8]/50 shadow-[0_0_20px_rgba(0,180,216,0.3)]">
+                Launch Intelligence Center
+              </Link>
+              <Link href="/about" className="btn-secondary flex items-center justify-center text-white border-white/30 hover:bg-white/10 backdrop-blur-sm">
+                Explore Technology
+              </Link>
+            </div>
 
-          {/* Scroll Indicator */}
-          <div className="mt-16 flex flex-col items-start gap-2 opacity-50">
-            <div className="w-5 h-8 rounded-full border border-[var(--text-tertiary)] flex justify-center pt-1.5">
-              <div className="w-1 h-2 rounded-full bg-[var(--text-tertiary)] animate-scroll" />
+            {/* Trust Metrics */}
+            <div className="flex gap-8 text-center bg-black/40 p-6 rounded-2xl backdrop-blur-md border border-white/10 max-w-2xl">
+              <div className="flex-1"><p className="text-3xl font-bold font-display text-white count-up" data-value="247">0</p><p className="text-[10px] font-mono text-gray-400 tracking-widest mt-1">VESSELS ANALYZED</p></div>
+              <div className="w-px bg-white/20" />
+              <div className="flex-1"><p className="text-3xl font-bold font-display text-[#E63946]"><span className="count-up" data-value="94.2">0</span>%</p><p className="text-[10px] font-mono text-gray-400 tracking-widest mt-1">CONFIDENCE</p></div>
+              <div className="w-px bg-white/20" />
+              <div className="flex-1"><p className="text-3xl font-bold font-display text-white"><span className="count-up" data-value="8.4">0</span> km²</p><p className="text-[10px] font-mono text-gray-400 tracking-widest mt-1">SPILL AREA</p></div>
             </div>
-            <span className="text-[9px] font-mono text-[var(--text-tertiary)] tracking-widest">SCROLL TO INVESTIGATE</span>
-          </div>
-        </div>
-      </section>
 
-      {/* ===== CH01: DETECT ===== */}
-      <section className="chapter-panel chapter-01 h-[150vh] flex items-center px-8 md:px-20">
-        <div className="content pointer-events-auto max-w-2xl">
-          <div className="flex items-center gap-2 mb-4">
-            <Satellite size={16} className="text-[var(--accent-ocean)]" />
-            <p className="text-xs font-mono text-[var(--accent-ocean)] tracking-[0.2em]">01 / DETECT</p>
-          </div>
-          <h2 className="text-4xl md:text-6xl font-display font-bold text-[var(--text-primary)] mb-6 tracking-tight">
-            See the Spill.
-          </h2>
-          <p className="text-lg text-[var(--text-secondary)] font-light max-w-md mb-8">
-            Sentinel-1 SAR imagery reveals surface anomalies invisible to the human eye.
-          </p>
-          <div className="flex gap-4">
-            <div className="metric-card flex-1">
-              <p className="text-[10px] font-mono text-[var(--text-tertiary)] tracking-widest mb-1">CONFIDENCE</p>
-              <p className="text-3xl font-bold text-[var(--risk-critical)]">97.4%</p>
-              <div className="evidence-bar mt-2"><div className="evidence-bar-fill" style={{width:'97.4%'}} /></div>
-            </div>
-            <div className="metric-card flex-1">
-              <p className="text-[10px] font-mono text-[var(--text-tertiary)] tracking-widest mb-1">SPILL AREA</p>
-              <p className="text-3xl font-bold text-[var(--text-primary)]">8.4<span className="text-lg ml-1">km²</span></p>
-              <p className="text-xs text-[var(--text-tertiary)] mt-1">Arabian Sea • 15.4°N, 65.2°E</p>
+            {/* Scroll Indicator */}
+            <div className="mt-20 flex flex-col items-center sm:items-start gap-3 opacity-60">
+              <div className="w-6 h-10 rounded-full border border-white/50 flex justify-center pt-2">
+                <div className="w-1.5 h-2.5 rounded-full bg-white animate-scroll" />
+              </div>
+              <span className="text-[9px] font-mono text-white tracking-widest uppercase">Scroll to Reconstruct Incident</span>
             </div>
           </div>
-        </div>
-      </section>
-      
-      {/* ===== CH02: TRACE ===== */}
-      <section className="chapter-panel chapter-02 h-[150vh] flex items-center justify-end text-right px-8 md:px-20">
-        <div className="content pointer-events-auto max-w-2xl">
-          <div className="flex items-center gap-2 mb-4 justify-end">
-            <p className="text-xs font-mono text-[var(--accent-ocean)] tracking-[0.2em]">02 / TRACE</p>
-            <Droplets size={16} className="text-[var(--accent-ocean)]" />
+        </section>
+
+        {/* ===== CH01: DETECT ===== */}
+        <section className="chapter-panel h-[150vh] flex items-center px-8 md:px-24">
+          <div className="content pointer-events-auto max-w-2xl">
+            <div className="flex items-center gap-3 mb-6 bg-black/50 w-max px-4 py-2 rounded-full border border-white/10 backdrop-blur-md">
+              <Satellite size={16} className="text-[#00B4D8]" />
+              <p className="text-xs font-mono text-[#00B4D8] tracking-[0.2em]">01 / DETECT</p>
+            </div>
+            <h2 className="text-5xl md:text-7xl font-display font-bold text-white mb-6 tracking-tight drop-shadow-lg leading-tight">
+              See the Invisible.
+            </h2>
+            <p className="text-xl text-gray-300 font-light max-w-lg mb-10 leading-relaxed drop-shadow-md">
+              Sentinel-1 Synthetic Aperture Radar (SAR) imagery penetrates clouds and darkness to reveal illicit surface anomalies with precision.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-6">
+              <div className="metric-card flex-1 bg-black/60 border-white/10 backdrop-blur-md">
+                <p className="text-[10px] font-mono text-gray-400 tracking-widest mb-2">AI CONFIDENCE INTERVAL</p>
+                <p className="text-4xl font-bold text-[#E63946] mb-3">97.4%</p>
+                <div className="h-1.5 bg-gray-800 rounded-full overflow-hidden"><div className="h-full bg-[#E63946]" style={{width:'97.4%'}} /></div>
+              </div>
+              <div className="metric-card flex-1 bg-black/60 border-white/10 backdrop-blur-md">
+                <p className="text-[10px] font-mono text-gray-400 tracking-widest mb-2">AFFECTED REGION</p>
+                <p className="text-4xl font-bold text-white mb-1">8.4<span className="text-xl ml-1 text-gray-400">km²</span></p>
+                <p className="text-xs text-gray-400 mt-2 font-mono">15.421°N, 65.239°E</p>
+              </div>
+            </div>
           </div>
-          <h2 className="text-4xl md:text-6xl font-display font-bold text-[var(--text-primary)] mb-6 tracking-tight">
-            Rewind the Ocean.
-          </h2>
-          <p className="text-lg text-[var(--text-secondary)] font-light ml-auto max-w-md mb-8">
-            Reverse ocean currents and wind vectors to reconstruct probable origin.
-          </p>
-          {/* Drift Timeline */}
-          <div className="flex items-center gap-0 justify-end">
-            {['T0','T-6h','T-12h','T-18h','T-24h'].map((t, i) => (
-              <div key={t} className="flex items-center">
-                <div className={`w-10 h-10 rounded-full border-2 flex items-center justify-center text-[9px] font-mono font-bold ${i === 4 ? 'border-[var(--risk-high)] text-[var(--risk-high)] bg-[var(--risk-high)]/10' : 'border-[var(--border-medium)] text-[var(--text-tertiary)]'}`}>
-                  {t}
+        </section>
+        
+        {/* ===== CH02: TRACE ===== */}
+        <section className="chapter-panel h-[150vh] flex items-center justify-end text-right px-8 md:px-24">
+          <div className="content pointer-events-auto max-w-2xl flex flex-col items-end">
+            <div className="flex items-center gap-3 mb-6 bg-black/50 w-max px-4 py-2 rounded-full border border-white/10 backdrop-blur-md">
+              <p className="text-xs font-mono text-[#00B4D8] tracking-[0.2em]">02 / TRACE</p>
+              <Droplets size={16} className="text-[#00B4D8]" />
+            </div>
+            <h2 className="text-5xl md:text-7xl font-display font-bold text-white mb-6 tracking-tight drop-shadow-lg leading-tight">
+              Rewind the Ocean.
+            </h2>
+            <p className="text-xl text-gray-300 font-light max-w-lg mb-10 leading-relaxed drop-shadow-md">
+              We mathematically reverse ocean currents, tidal forces, and wind vectors to reconstruct the particle trajectory back to its exact moment of origin.
+            </p>
+            {/* Drift Timeline */}
+            <div className="flex items-center gap-0 justify-end bg-black/40 p-6 rounded-2xl border border-white/10 backdrop-blur-md">
+              {['T0','T-6h','T-12h','T-18h','T-24h'].map((t, i) => (
+                <div key={t} className="flex items-center">
+                  <div className={`w-12 h-12 rounded-full border-2 flex items-center justify-center text-[10px] font-mono font-bold shadow-lg ${i === 4 ? 'border-[#F59E0B] text-[#F59E0B] bg-[#F59E0B]/20 animate-pulse' : 'border-white/30 text-gray-300 bg-black/50'}`}>
+                    {t}
+                  </div>
+                  {i < 4 && <div className="w-8 h-px bg-white/30" />}
                 </div>
-                {i < 4 && <div className="w-6 h-px bg-[var(--border-medium)]" />}
-              </div>
-            ))}
+              ))}
+            </div>
+            <p className="text-xs font-mono text-[#F59E0B] mt-6 tracking-widest drop-shadow-md">ORIGIN PROBABILITY ZONE ISOLATED</p>
           </div>
-          <p className="text-xs font-mono text-[var(--risk-high)] mt-4 tracking-widest">PROBABLE ORIGIN ZONE IDENTIFIED</p>
-        </div>
-      </section>
+        </section>
 
-      {/* ===== CH03: CORRELATE ===== */}
-      <section className="chapter-panel chapter-03 h-[150vh] flex items-center px-8 md:px-20">
-        <div className="content pointer-events-auto max-w-2xl">
-          <div className="flex items-center gap-2 mb-4">
-            <Ship size={16} className="text-[var(--accent-ocean)]" />
-            <p className="text-xs font-mono text-[var(--accent-ocean)] tracking-[0.2em]">03 / CORRELATE</p>
-          </div>
-          <h2 className="text-4xl md:text-6xl font-display font-bold text-[var(--text-primary)] mb-6 tracking-tight">
-            Find the Traffic<br/>That Matters.
-          </h2>
-          {/* Progressive Filter */}
-          <div className="flex flex-col gap-3 max-w-sm">
-            {[
-              {n:'247',label:'VESSELS IN REGION',w:'100%'},
-              {n:'84',label:'TIME WINDOW MATCH',w:'34%'},
-              {n:'18',label:'SPATIAL PROXIMITY',w:'7.3%'},
-              {n:'5',label:'TRAJECTORY OVERLAP',w:'2%'},
-              {n:'3',label:'CANDIDATES',w:'1.2%'},
-            ].map((f,i) => (
-              <div key={i} className="flex items-center gap-4">
-                <span className={`text-2xl font-bold font-display w-12 text-right ${i === 4 ? 'text-[var(--risk-critical)]' : 'text-[var(--text-primary)]'}`}>{f.n}</span>
-                <div className="flex-1">
-                  <div className="evidence-bar"><div className="evidence-bar-fill" style={{width: f.w, background: i === 4 ? 'var(--risk-critical)' : undefined}} /></div>
-                  <p className="text-[9px] font-mono text-[var(--text-tertiary)] tracking-widest mt-1">{f.label}</p>
+        {/* ===== CH03: CORRELATE ===== */}
+        <section className="chapter-panel h-[150vh] flex items-center px-8 md:px-24">
+          <div className="content pointer-events-auto max-w-2xl">
+            <div className="flex items-center gap-3 mb-6 bg-black/50 w-max px-4 py-2 rounded-full border border-white/10 backdrop-blur-md">
+              <Ship size={16} className="text-[#00B4D8]" />
+              <p className="text-xs font-mono text-[#00B4D8] tracking-[0.2em]">03 / CORRELATE</p>
+            </div>
+            <h2 className="text-5xl md:text-7xl font-display font-bold text-white mb-6 tracking-tight drop-shadow-lg leading-tight">
+              Filter the Noise.
+            </h2>
+            <p className="text-xl text-gray-300 font-light max-w-lg mb-10 leading-relaxed drop-shadow-md">
+              Billions of AIS telemetry points are cross-referenced against the drift corridor to eliminate innocent traffic.
+            </p>
+            {/* Progressive Filter */}
+            <div className="flex flex-col gap-4 max-w-md bg-black/60 p-8 rounded-3xl border border-white/10 backdrop-blur-md">
+              {[
+                {n:'247',label:'VESSELS IN REGION',w:'100%'},
+                {n:'84',label:'TIME WINDOW MATCH',w:'34%'},
+                {n:'18',label:'SPATIAL PROXIMITY',w:'7.3%'},
+                {n:'5',label:'TRAJECTORY OVERLAP',w:'2%'},
+                {n:'3',label:'SUSPECT CANDIDATES',w:'1.2%'},
+              ].map((f,i) => (
+                <div key={i} className="flex items-center gap-6 group">
+                  <span className={`text-3xl font-bold font-display w-16 text-right transition-colors ${i === 4 ? 'text-[#E63946]' : 'text-white group-hover:text-[#00B4D8]'}`}>{f.n}</span>
+                  <div className="flex-1">
+                    <div className="h-1.5 bg-gray-800 rounded-full overflow-hidden mb-1.5">
+                      <div className="h-full transition-all duration-1000" style={{width: f.w, background: i === 4 ? '#E63946' : '#0077B6'}} />
+                    </div>
+                    <p className="text-[10px] font-mono text-gray-400 tracking-widest">{f.label}</p>
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* ===== CH04: ATTRIBUTE ===== */}
-      <section className="chapter-panel chapter-04 h-[150vh] flex items-center justify-center text-center px-8 md:px-20">
-        <div className="content pointer-events-auto max-w-3xl">
-          <div className="flex items-center gap-2 mb-4 justify-center">
-            <Search size={16} className="text-[var(--accent-ocean)]" />
-            <p className="text-xs font-mono text-[var(--accent-ocean)] tracking-[0.2em]">04 / ATTRIBUTE</p>
-          </div>
-          <h2 className="text-4xl md:text-6xl font-display font-bold text-[var(--text-primary)] mb-8 tracking-tight">
-            Who Could Be<br/>the Source?
-          </h2>
-          <div className="flex gap-4 justify-center flex-wrap">
-            {[
-              {id:'A',name:'VESSEL 82A',score:'91.4',color:'var(--risk-critical)'},
-              {id:'B',name:'VESSEL 41C',score:'74.2',color:'var(--risk-high)'},
-              {id:'C',name:'VESSEL 19K',score:'61.8',color:'var(--text-tertiary)'},
-            ].map(c => (
-              <div key={c.id} className="metric-card text-center w-48" style={{borderColor: c.id === 'A' ? c.color : undefined}}>
-                <p className="text-[10px] font-mono text-[var(--text-tertiary)] tracking-widest mb-2">CANDIDATE {c.id}</p>
-                <p className="text-4xl font-bold" style={{color: c.color}}>{c.score}</p>
-                <p className="text-xs font-mono text-[var(--text-secondary)] mt-2">{c.name}</p>
-                {c.id === 'A' && <span className="threat-badge critical mt-3">HIGHEST RANKED</span>}
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ===== CH05: EXPLAIN ===== */}
-      <section className="chapter-panel chapter-05 h-[150vh] flex items-center justify-end text-right px-8 md:px-20">
-        <div className="content pointer-events-auto max-w-xl">
-          <div className="flex items-center gap-2 mb-4 justify-end">
-            <p className="text-xs font-mono text-[var(--accent-ocean)] tracking-[0.2em]">05 / EXPLAIN</p>
-            <Brain size={16} className="text-[var(--accent-ocean)]" />
-          </div>
-          <h2 className="text-4xl md:text-6xl font-display font-bold text-[var(--text-primary)] mb-8 tracking-tight">
-            Why This Vessel?
-          </h2>
-          <div className="flex flex-col gap-4 text-left">
-            {[
-              {factor:'TEMPORAL MATCH',pct:98,desc:'Perfect intersection at T-12h'},
-              {factor:'SPATIAL OVERLAP',pct:94,desc:'Trajectory bisects origin zone'},
-              {factor:'DRIFT COMPATIBILITY',pct:91,desc:'Aligned with backtrack model'},
-              {factor:'BEHAVIORAL SIGNAL',pct:87,desc:'Suspicious speed reduction'},
-            ].map(f => (
-              <div key={f.factor}>
-                <div className="flex justify-between mb-1">
-                  <span className="text-[10px] font-mono text-[var(--text-secondary)] tracking-widest">{f.factor}</span>
-                  <span className="text-sm font-bold text-[var(--text-primary)]">{f.pct}%</span>
+        {/* ===== CH04: ATTRIBUTE ===== */}
+        <section className="chapter-panel h-[150vh] flex items-center justify-center text-center px-8 md:px-24">
+          <div className="content pointer-events-auto max-w-4xl flex flex-col items-center">
+            <div className="flex items-center gap-3 mb-6 bg-black/50 w-max px-4 py-2 rounded-full border border-white/10 backdrop-blur-md">
+              <Search size={16} className="text-[#00B4D8]" />
+              <p className="text-xs font-mono text-[#00B4D8] tracking-[0.2em]">04 / ATTRIBUTE</p>
+            </div>
+            <h2 className="text-5xl md:text-7xl font-display font-bold text-white mb-10 tracking-tight drop-shadow-lg leading-tight">
+              Who is Responsible?
+            </h2>
+            <div className="flex flex-col sm:flex-row gap-6 justify-center w-full">
+              {[
+                {id:'A',name:'VESSEL 82A',score:'91.4',color:'#E63946', type: 'OIL TANKER'},
+                {id:'B',name:'VESSEL 41C',score:'74.2',color:'#F59E0B', type: 'BULK CARRIER'},
+                {id:'C',name:'VESSEL 19K',score:'61.8',color:'#9CA3AF', type: 'CONTAINER'},
+              ].map(c => (
+                <div key={c.id} className="metric-card bg-black/70 backdrop-blur-lg flex-1 py-8 relative" style={{borderColor: c.id === 'A' ? c.color : 'rgba(255,255,255,0.1)'}}>
+                  {c.id === 'A' && <div className="absolute inset-0 bg-gradient-to-b from-[#E63946]/10 to-transparent pointer-events-none" />}
+                  <p className="text-[10px] font-mono text-gray-400 tracking-widest mb-4">CANDIDATE {c.id} • {c.type}</p>
+                  <p className="text-6xl font-bold font-display mb-2 drop-shadow-lg" style={{color: c.color}}>{c.score}</p>
+                  <p className="text-sm font-mono text-gray-300 mt-4 font-medium">{c.name}</p>
+                  {c.id === 'A' && <span className="inline-block mt-4 text-[10px] font-mono font-bold px-3 py-1 bg-[#E63946]/20 text-[#E63946] border border-[#E63946]/40 rounded-full shadow-[0_0_15px_rgba(230,57,70,0.3)]">HIGHEST PROBABILITY</span>}
                 </div>
-                <div className="evidence-bar"><div className="evidence-bar-fill" style={{width: `${f.pct}%`}} /></div>
-                <p className="text-[10px] text-[var(--text-tertiary)] mt-1">{f.desc}</p>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* ===== CH06: ASSESS ===== */}
-      <section className="chapter-panel chapter-06 h-[150vh] flex items-center px-8 md:px-20">
-        <div className="content pointer-events-auto max-w-2xl">
-          <div className="flex items-center gap-2 mb-4">
-            <ShieldAlert size={16} className="text-[var(--risk-critical)]" />
-            <p className="text-xs font-mono text-[var(--accent-ocean)] tracking-[0.2em]">06 / ASSESS</p>
+        {/* ===== CH05: EXPLAIN ===== */}
+        <section className="chapter-panel h-[150vh] flex items-center justify-end text-right px-8 md:px-24">
+          <div className="content pointer-events-auto max-w-xl flex flex-col items-end">
+            <div className="flex items-center gap-3 mb-6 bg-black/50 w-max px-4 py-2 rounded-full border border-white/10 backdrop-blur-md">
+              <p className="text-xs font-mono text-[#00B4D8] tracking-[0.2em]">05 / EXPLAIN</p>
+              <Brain size={16} className="text-[#00B4D8]" />
+            </div>
+            <h2 className="text-5xl md:text-7xl font-display font-bold text-white mb-6 tracking-tight drop-shadow-lg leading-tight">
+              Evidence Factors.
+            </h2>
+            <p className="text-xl text-gray-300 font-light max-w-lg mb-10 leading-relaxed drop-shadow-md">
+              Our AI doesn't just guess. It provides transparent, courtroom-ready geospatial evidence.
+            </p>
+            <div className="flex flex-col gap-6 text-left w-full bg-black/60 p-8 rounded-3xl border border-white/10 backdrop-blur-md">
+              {[
+                {factor:'TEMPORAL MATCH',pct:98,desc:'Perfect intersection at T-12h window'},
+                {factor:'SPATIAL OVERLAP',pct:94,desc:'Trajectory bisects predicted origin zone'},
+                {factor:'DRIFT COMPATIBILITY',pct:91,desc:'Slick expansion matches vessel wake'},
+                {factor:'BEHAVIORAL ANOMALY',pct:87,desc:'Suspicious 40% speed reduction detected'},
+              ].map(f => (
+                <div key={f.factor} className="group">
+                  <div className="flex justify-between mb-2">
+                    <span className="text-[11px] font-mono text-gray-300 tracking-widest">{f.factor}</span>
+                    <span className="text-sm font-bold text-white group-hover:text-[#00B4D8] transition-colors">{f.pct}%</span>
+                  </div>
+                  <div className="h-2 bg-gray-800 rounded-full overflow-hidden mb-2">
+                    <div className="h-full bg-gradient-to-r from-[#0077B6] to-[#00B4D8]" style={{width: `${f.pct}%`}} />
+                  </div>
+                  <p className="text-[10px] text-gray-400 font-mono">{f.desc}</p>
+                </div>
+              ))}
+            </div>
           </div>
-          <h2 className="text-4xl md:text-6xl font-display font-bold text-[var(--text-primary)] mb-8 tracking-tight">
-            What Is at Risk?
-          </h2>
-          <div className="grid grid-cols-2 gap-3 max-w-lg">
-            {[
-              {cat:'ECOLOGICAL',level:'HIGH',badge:'critical'},
-              {cat:'FISHERIES',level:'HIGH',badge:'critical'},
-              {cat:'COASTAL',level:'MEDIUM',badge:'medium'},
-              {cat:'NAVIGATION',level:'MEDIUM',badge:'medium'},
-            ].map(t => (
-              <div key={t.cat} className="metric-card flex items-center justify-between">
-                <span className="text-xs font-mono text-[var(--text-secondary)]">{t.cat}</span>
-                <span className={`threat-badge ${t.badge}`}>{t.level}</span>
-              </div>
-            ))}
-          </div>
-          <div className="mt-6 metric-card max-w-lg flex items-center justify-between" style={{borderColor:'var(--risk-critical)'}}>
-            <span className="text-sm font-mono font-bold text-[var(--text-primary)]">RESPONSE PRIORITY</span>
-            <span className="threat-badge critical text-sm">CRITICAL</span>
-          </div>
-        </div>
-      </section>
+        </section>
 
-      {/* ===== CH07: RESPOND ===== */}
-      <section className="chapter-panel chapter-07 h-[150vh] flex items-center justify-center text-center px-8 md:px-20">
-        <div className="content pointer-events-auto max-w-2xl">
-          <div className="flex items-center gap-2 mb-4 justify-center">
-            <Activity size={16} className="text-[var(--accent-ocean)]" />
-            <p className="text-xs font-mono text-[var(--accent-ocean)] tracking-[0.2em]">07 / RESPOND</p>
+        {/* ===== CH06: ASSESS ===== */}
+        <section className="chapter-panel h-[150vh] flex items-center px-8 md:px-24">
+          <div className="content pointer-events-auto max-w-2xl">
+            <div className="flex items-center gap-3 mb-6 bg-black/50 w-max px-4 py-2 rounded-full border border-white/10 backdrop-blur-md">
+              <ShieldAlert size={16} className="text-[#E63946]" />
+              <p className="text-xs font-mono text-[#E63946] tracking-[0.2em]">06 / ASSESS</p>
+            </div>
+            <h2 className="text-5xl md:text-7xl font-display font-bold text-white mb-6 tracking-tight drop-shadow-lg leading-tight">
+              Predict the Threat.
+            </h2>
+            <p className="text-xl text-gray-300 font-light max-w-lg mb-10 leading-relaxed drop-shadow-md">
+              Forward-projection modeling determines the immediate threat to vulnerable coastal ecosystems and fisheries.
+            </p>
+            <div className="grid grid-cols-2 gap-4 max-w-lg mb-6">
+              {[
+                {cat:'MANGROVE ECOSYSTEMS',level:'HIGH',badge:'bg-[#E63946]/20 text-[#E63946] border-[#E63946]/40'},
+                {cat:'COMMERCIAL FISHERIES',level:'HIGH',badge:'bg-[#E63946]/20 text-[#E63946] border-[#E63946]/40'},
+                {cat:'TOURISM COASTLINE',level:'MEDIUM',badge:'bg-[#F59E0B]/20 text-[#F59E0B] border-[#F59E0B]/40'},
+                {cat:'SHIPPING LANES',level:'LOW',badge:'bg-[#10B981]/20 text-[#10B981] border-[#10B981]/40'},
+              ].map(t => (
+                <div key={t.cat} className="metric-card bg-black/60 border-white/10 flex flex-col gap-3 p-5 backdrop-blur-md">
+                  <span className="text-[10px] font-mono text-gray-400 tracking-widest">{t.cat}</span>
+                  <span className={`self-start text-[10px] font-mono font-bold px-2 py-1 rounded border ${t.badge}`}>{t.level} RISK</span>
+                </div>
+              ))}
+            </div>
+            <div className="metric-card bg-[#E63946]/10 border-[#E63946]/50 max-w-lg flex items-center justify-between p-6 backdrop-blur-lg shadow-[0_0_30px_rgba(230,57,70,0.15)]">
+              <span className="text-sm font-mono font-bold text-white tracking-widest">DEPLOYMENT PRIORITY</span>
+              <span className="text-[12px] font-mono font-bold px-3 py-1 bg-[#E63946] text-white rounded shadow-lg animate-pulse">CRITICAL OVERRIDE</span>
+            </div>
           </div>
-          <h2 className="text-4xl md:text-6xl font-display font-bold text-[var(--text-primary)] mb-8 tracking-tight">
-            From Intelligence<br/>to Action.
-          </h2>
-          <div className="flex gap-3 justify-center flex-wrap">
-            {[
-              {asset:'SKIMMER 01',status:'AVAILABLE',color:'var(--risk-low)'},
-              {asset:'BOOM TEAM A',status:'DEPLOYED',color:'var(--risk-high)'},
-              {asset:'UAV RECON',status:'STANDBY',color:'var(--accent-ocean)'},
-            ].map(a => (
-              <div key={a.asset} className="metric-card w-44 text-left">
-                <p className="text-[10px] font-mono text-[var(--text-tertiary)] tracking-widest">{a.asset}</p>
-                <p className="text-sm font-bold mt-1" style={{color: a.color}}>{a.status}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+        </section>
 
-      {/* ===== CH08: MONITOR ===== */}
-      <section className="chapter-panel chapter-09 h-[150vh] flex items-center justify-end text-right px-8 md:px-20">
-        <div className="content pointer-events-auto max-w-xl">
-          <div className="flex items-center gap-2 mb-4 justify-end">
-            <p className="text-xs font-mono text-[var(--accent-ocean)] tracking-[0.2em]">08 / MONITOR</p>
-            <Radio size={16} className="text-[var(--accent-ocean)]" />
+        {/* ===== CH07: RESPOND ===== */}
+        <section className="chapter-panel h-[150vh] flex items-center justify-center text-center px-8 md:px-24">
+          <div className="content pointer-events-auto max-w-4xl flex flex-col items-center">
+            <div className="flex items-center gap-3 mb-6 bg-black/50 w-max px-4 py-2 rounded-full border border-white/10 backdrop-blur-md">
+              <Activity size={16} className="text-[#00B4D8]" />
+              <p className="text-xs font-mono text-[#00B4D8] tracking-[0.2em]">07 / RESPOND</p>
+            </div>
+            <h2 className="text-5xl md:text-7xl font-display font-bold text-white mb-10 tracking-tight drop-shadow-lg leading-tight">
+              Data-Driven Action.
+            </h2>
+            <div className="flex gap-4 justify-center flex-wrap w-full">
+              {[
+                {asset:'SKIMMER FLEET 01',type:'OIL RECOVERY',status:'IN POSITION',color:'#10B981'},
+                {asset:'BOOM TEAM ALPHA',type:'CONTAINMENT',status:'DEPLOYED',color:'#F59E0B'},
+                {asset:'UAV RECON SQUAD',type:'AERIAL SURVEY',status:'ACTIVE',color:'#00B4D8'},
+              ].map(a => (
+                <div key={a.asset} className="metric-card bg-black/70 border-white/10 backdrop-blur-lg w-56 text-left py-6">
+                  <p className="text-[10px] font-mono text-gray-400 tracking-widest mb-1">{a.type}</p>
+                  <p className="text-sm font-bold text-white mb-4">{a.asset}</p>
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 rounded-full animate-pulse" style={{backgroundColor: a.color}} />
+                    <p className="text-[10px] font-mono font-bold" style={{color: a.color}}>{a.status}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
-          <h2 className="text-4xl md:text-6xl font-display font-bold text-[var(--text-primary)] mb-6 tracking-tight">
-            Continuous<br/>Intelligence.
-          </h2>
-          <p className="text-lg text-[var(--text-secondary)] font-light ml-auto max-w-md">
-            Every new satellite pass updates the model. The investigation never sleeps.
-          </p>
-        </div>
-      </section>
+        </section>
 
-      {/* ===== FINAL HERO ===== */}
-      <section className="chapter-panel chapter-10 h-[150vh] flex items-center justify-center text-center px-8 md:px-20">
-        <div className="content pointer-events-auto max-w-3xl">
-          <p className="text-xs font-mono text-[var(--accent-ocean)] tracking-[0.3em] mb-6">INVESTIGATION COMPLETE</p>
-          <h1 className="text-5xl md:text-8xl font-display font-bold text-[var(--text-primary)] mb-3 tracking-tight leading-[0.95]">
-            SPILLTRACE<br/><span className="gradient-text">AI</span>
-          </h1>
-          <p className="text-xl text-[var(--text-secondary)] font-light max-w-lg mx-auto mb-10">
-            From Space to Suspect.
-          </p>
-          {/* Summary Stats */}
-          <div className="flex justify-center gap-6 flex-wrap mb-10">
-            {[
-              {v:'1',l:'SPILL DETECTED'},
-              {v:'247',l:'VESSELS ANALYZED'},
-              {v:'3',l:'CANDIDATES'},
-              {v:'1',l:'HIGHEST-RANKED SOURCE'},
-              {v:'3',l:'HIGH-RISK ZONES'},
-            ].map(s => (
-              <div key={s.l} className="text-center">
-                <p className="text-2xl font-bold text-[var(--text-primary)]">{s.v}</p>
-                <p className="text-[9px] font-mono text-[var(--text-tertiary)] tracking-widest max-w-[100px]">{s.l}</p>
-              </div>
-            ))}
+        {/* ===== CH08: MONITOR ===== */}
+        <section className="chapter-panel h-[150vh] flex items-center justify-end text-right px-8 md:px-24">
+          <div className="content pointer-events-auto max-w-xl flex flex-col items-end">
+            <div className="flex items-center gap-3 mb-6 bg-black/50 w-max px-4 py-2 rounded-full border border-white/10 backdrop-blur-md">
+              <p className="text-xs font-mono text-[#00B4D8] tracking-[0.2em]">08 / MONITOR</p>
+              <Radio size={16} className="text-[#00B4D8]" />
+            </div>
+            <h2 className="text-5xl md:text-7xl font-display font-bold text-white mb-6 tracking-tight drop-shadow-lg leading-tight">
+              The Mission Never Stops.
+            </h2>
+            <p className="text-xl text-gray-300 font-light max-w-lg mb-8 leading-relaxed drop-shadow-md">
+              Every new satellite pass automatically updates the simulation model. We maintain a persistent overwatch on the world's oceans.
+            </p>
           </div>
-          <div className="flex justify-center gap-4">
-            <Link href="/investigate" className="btn-primary pointer-events-auto">See the Evidence</Link>
-            <Link href="/about" className="btn-secondary pointer-events-auto">How It Works</Link>
-          </div>
-        </div>
-      </section>
+        </section>
 
-      <div className="h-[20vh]" />
+        {/* ===== FINAL HERO ===== */}
+        <section className="chapter-panel h-[150vh] flex items-center justify-center text-center px-8 md:px-24">
+          <div className="content pointer-events-auto max-w-4xl flex flex-col items-center">
+            <p className="text-xs font-mono text-[#10B981] tracking-[0.4em] mb-6 drop-shadow-md bg-black/50 px-4 py-2 rounded-full border border-[#10B981]/30">INVESTIGATION COMPLETE</p>
+            <h1 className="text-6xl md:text-9xl font-display font-bold text-white mb-4 tracking-tight leading-[0.95] drop-shadow-2xl">
+              SPILLTRACE<br/><span className="text-transparent bg-clip-text bg-gradient-to-r from-[#00B4D8] to-[#90E0EF]">AI</span>
+            </h1>
+            <p className="text-2xl text-gray-200 font-light max-w-lg mx-auto mb-16 drop-shadow-md">
+              Protecting the Future of the Ocean.
+            </p>
+            {/* Summary Stats */}
+            <div className="flex justify-center gap-8 flex-wrap mb-16 bg-black/40 p-8 rounded-3xl border border-white/10 backdrop-blur-md w-full">
+              {[
+                {v:'1',l:'CRITICAL SPILL'},
+                {v:'247',l:'VESSELS'},
+                {v:'3',l:'CANDIDATES'},
+                {v:'91%',l:'CONFIDENCE'},
+                {v:'1',l:'CULPRIT'},
+              ].map(s => (
+                <div key={s.l} className="text-center flex-1">
+                  <p className="text-4xl font-bold font-display text-white drop-shadow-md mb-2">{s.v}</p>
+                  <p className="text-[10px] font-mono text-[#00B4D8] tracking-widest">{s.l}</p>
+                </div>
+              ))}
+            </div>
+            <div className="flex flex-col sm:flex-row justify-center gap-6">
+              <Link href="/investigate" className="btn-primary bg-[#0077B6] hover:bg-[#023E8A] border border-[#00B4D8]/50 shadow-[0_0_30px_rgba(0,180,216,0.4)] px-8 py-4 text-sm">
+                Launch Intelligence Center
+              </Link>
+              <Link href="/about" className="btn-secondary text-white border-white/30 hover:bg-white/10 backdrop-blur-sm px-8 py-4 text-sm">
+                System Methodology
+              </Link>
+            </div>
+          </div>
+        </section>
+
+        <div className="h-[20vh]" />
+      </div>
     </div>
   );
 }
