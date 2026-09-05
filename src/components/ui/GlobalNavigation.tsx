@@ -5,13 +5,15 @@ import { motion, useScroll } from "framer-motion";
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Maximize, Search } from "lucide-react";
+import { Maximize, Search, Play } from "lucide-react";
+import { useInvestigationStore } from "@/store/investigationStore";
 
 export default function GlobalNavigation() {
   const { scrollYProgress } = useScroll();
   const [scrolled, setScrolled] = useState(false);
   const [isLive, setIsLive] = useState(false);
   const pathname = usePathname();
+  const openIntroVideo = useInvestigationStore((state) => state.openIntroVideo);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -59,7 +61,19 @@ export default function GlobalNavigation() {
             <Link href="/about" className={`hover:text-[var(--accent-ocean)] transition-colors ${pathname === '/about' ? 'text-[var(--accent-ocean)] font-bold' : ''}`}>ABOUT</Link>
           </div>
 
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3 sm:gap-4">
+            {/* Watch Intro Button */}
+            <button 
+              onClick={openIntroVideo}
+              className="flex items-center gap-2 text-[10px] font-mono tracking-widest px-3 py-1.5 rounded-lg bg-[#00F0FF]/10 hover:bg-[#00F0FF]/25 text-[#00F0FF] border border-[#00F0FF]/50 shadow-[0_0_15px_rgba(0,240,255,0.25)] transition-all font-bold cursor-pointer group"
+              title="Watch SpillTrace AI Intro Video"
+            >
+              <div className="w-4 h-4 rounded-full bg-[#00F0FF] text-black flex items-center justify-center group-hover:scale-110 transition-transform shadow-[0_0_8px_#00F0FF]">
+                <Play size={10} className="fill-black ml-0.5" />
+              </div>
+              <span className="hidden sm:inline">WATCH INTRO</span>
+            </button>
+
             {/* Live/Demo Toggle */}
             <button 
               onClick={() => setIsLive(!isLive)}

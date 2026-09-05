@@ -30,6 +30,7 @@ interface InvestigationState {
   selectedVesselId: string | null;
   mapMode: 'SATELLITE' | 'HYBRID' | 'ROADMAP' | 'TERRAIN';
   mode: 'DEMO' | 'LIVE';
+  isIntroVideoOpen: boolean;
   
   // Actions
   setStep: (step: InvestigationStep) => void;
@@ -40,6 +41,8 @@ interface InvestigationState {
   selectVessel: (id: string | null) => void;
   setMapMode: (mode: 'SATELLITE' | 'HYBRID' | 'ROADMAP' | 'TERRAIN') => void;
   setMode: (mode: 'DEMO' | 'LIVE') => void;
+  openIntroVideo: () => void;
+  closeIntroVideo: () => void;
   resetInvestigation: () => void;
 }
 
@@ -62,6 +65,7 @@ export const useInvestigationStore = create<InvestigationState>((set) => ({
   selectedVesselId: null,
   mapMode: 'SATELLITE',
   mode: 'DEMO',
+  isIntroVideoOpen: false,
 
   setStep: (step) => set({ currentStep: step }),
   
@@ -97,6 +101,9 @@ export const useInvestigationStore = create<InvestigationState>((set) => ({
   setMapMode: (mode) => set({ mapMode: mode }),
   
   setMode: (mode) => set({ mode }),
+
+  openIntroVideo: () => set({ isIntroVideoOpen: true }),
+  closeIntroVideo: () => set({ isIntroVideoOpen: false }),
 
   resetInvestigation: () => set({ 
     currentStep: '01-DETECT', 

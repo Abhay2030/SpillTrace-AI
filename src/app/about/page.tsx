@@ -2,7 +2,8 @@
 
 import React from "react";
 import dynamic from "next/dynamic";
-import { Satellite, Droplets, Ship, Search, Brain, ShieldAlert, Activity, Radio, Eye } from "lucide-react";
+import { Satellite, Droplets, Ship, Search, Brain, ShieldAlert, Activity, Radio, Eye, Play, Film, Maximize2 } from "lucide-react";
+import { useInvestigationStore } from "@/store/investigationStore";
 
 const GlobalNavigation = dynamic(() => import("@/components/ui/GlobalNavigation"), { ssr: false });
 
@@ -33,6 +34,8 @@ const dataSources = [
 ];
 
 export default function AboutPage() {
+  const openIntroVideo = useInvestigationStore((state) => state.openIntroVideo);
+
   return (
     <main className="w-full min-h-screen bg-[var(--bg-primary)] flex flex-col">
       <GlobalNavigation />
@@ -42,9 +45,19 @@ export default function AboutPage() {
         <div className="text-center mb-16 pt-8">
           <p className="text-xs font-mono text-[var(--accent-ocean)] tracking-[0.3em] mb-3">MINISTRY OF DISASTER MANAGEMENT • NTRO</p>
           <h1 className="text-4xl md:text-6xl font-display font-bold mb-4 tracking-tight">Maritime Incident<br/>Intelligence</h1>
-          <p className="text-lg text-[var(--text-secondary)] font-light max-w-2xl mx-auto">
+          <p className="text-lg text-[var(--text-secondary)] font-light max-w-2xl mx-auto mb-8">
             SpillTrace AI combines satellite aperture radar, automatic identification systems, and metocean drift modeling to probabilistically identify the source of illegal maritime oil spills.
           </p>
+
+          <button 
+            onClick={openIntroVideo}
+            className="inline-flex items-center gap-3 px-6 py-3.5 bg-gradient-to-r from-[#0077B6] to-[#00B4D8] hover:from-[#0096C7] hover:to-[#48CAE4] border border-[#00B4D8]/50 rounded-xl text-white font-mono text-xs tracking-wider font-bold shadow-[0_0_20px_rgba(0,180,216,0.3)] transition-all hover:scale-[1.03] cursor-pointer"
+          >
+            <div className="w-7 h-7 rounded-full bg-white text-[#0077B6] flex items-center justify-center shadow-md">
+              <Play size={14} className="fill-[#0077B6] ml-0.5" />
+            </div>
+            <span>WATCH SYSTEM INTRO VIDEO</span>
+          </button>
         </div>
 
         {/* Pipeline */}

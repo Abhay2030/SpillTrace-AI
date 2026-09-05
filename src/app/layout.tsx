@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import CommandPalette from "@/components/ui/CommandPalette";
+import IntroVideoModal from "@/components/ui/IntroVideoModal";
 
 export const metadata: Metadata = {
   title: "SpillTrace AI — From Space to Suspect | Ministry of Disaster Management",
@@ -47,6 +48,7 @@ export default function RootLayout({
       <body className="antialiased">
         {children}
         <CommandPalette />
+        <IntroVideoModal />
       </body>
     </html>
   );

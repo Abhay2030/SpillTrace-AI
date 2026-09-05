@@ -6,7 +6,8 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Link from "next/link";
 import Image from "next/image";
 import dynamic from "next/dynamic";
-import { Satellite, Droplets, Ship, Search, ShieldAlert, Brain, Activity, Radio, ChevronDown, Crosshair, AlertTriangle, ArrowRight, Compass } from "lucide-react";
+import { Satellite, Droplets, Ship, Search, ShieldAlert, Brain, Activity, Radio, ChevronDown, Crosshair, AlertTriangle, ArrowRight, Compass, Play, Film, Maximize2 } from "lucide-react";
+import { useInvestigationStore } from "@/store/investigationStore";
 
 const HeroGlobeWidget = dynamic(
   () => import("@/components/canvas/HeroGlobeWidget"),
@@ -31,6 +32,7 @@ const images = {
 export default function CinematicOverlay() {
   const containerRef = useRef<HTMLDivElement>(null);
   const bgRef = useRef<HTMLDivElement>(null);
+  const openIntroVideo = useInvestigationStore((state) => state.openIntroVideo);
 
   useEffect(() => {
     // Ensure 3D Earth Globe & Satellite Canvas remains 100% visible
@@ -153,13 +155,68 @@ export default function CinematicOverlay() {
             <p className="text-2xl text-gray-300 font-light max-w-lg mb-12 drop-shadow-md leading-relaxed">
               From Space to Suspect.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 mb-10">
+            <div className="flex flex-col sm:flex-row gap-4 mb-8">
+              <button 
+                onClick={openIntroVideo}
+                className="flex items-center justify-center gap-3 px-6 py-3.5 bg-gradient-to-r from-[#00F0FF]/20 to-[#0077B6]/30 hover:from-[#00F0FF]/35 hover:to-[#0077B6]/50 border border-[#00F0FF]/60 rounded-xl text-white font-mono text-xs tracking-wider font-bold shadow-[0_0_25px_rgba(0,240,255,0.35)] transition-all hover:scale-[1.03] active:scale-[0.98] group cursor-pointer"
+              >
+                <div className="w-8 h-8 rounded-full bg-[#00F0FF] text-black flex items-center justify-center shadow-[0_0_15px_#00F0FF] group-hover:scale-110 transition-transform">
+                  <Play size={16} className="fill-black ml-0.5" />
+                </div>
+                <span>WATCH INTRO VIDEO</span>
+              </button>
+
               <Link href="/investigate" className="btn-primary flex items-center justify-center bg-[#0077B6] hover:bg-[#023E8A] border border-[#00B4D8]/50 shadow-[0_0_20px_rgba(0,180,216,0.3)]">
                 Launch Intelligence Center
               </Link>
               <Link href="/about" className="btn-secondary flex items-center justify-center text-white border-white/30 hover:bg-white/10 backdrop-blur-sm">
                 Explore Technology
               </Link>
+            </div>
+
+            {/* Embedded System Intro Video Showcase */}
+            <div className="w-full max-w-2xl bg-black/75 border border-[#00F0FF]/40 backdrop-blur-xl rounded-2xl p-4 sm:p-5 shadow-[0_0_40px_rgba(0,240,255,0.2)] mb-10 group/vid">
+              <div className="flex items-center justify-between border-b border-white/10 pb-3 mb-3">
+                <div className="flex items-center gap-2.5">
+                  <Film className="w-4 h-4 text-[#00F0FF] animate-pulse" />
+                  <span className="text-xs font-mono font-bold tracking-wider text-[#00F0FF]">
+                    SPILLTRACE AI INTRO & DEMO
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-[9px] font-mono px-2 py-0.5 bg-[#10B981]/20 text-[#10B981] border border-[#10B981]/40 rounded-full font-bold">
+                    FULL HD 1080P
+                  </span>
+                  <button 
+                    onClick={openIntroVideo}
+                    className="text-[9px] font-mono px-2 py-0.5 bg-[#00F0FF]/15 text-[#00F0FF] hover:bg-[#00F0FF]/30 border border-[#00F0FF]/40 rounded-full font-bold flex items-center gap-1 transition-colors cursor-pointer"
+                  >
+                    <Maximize2 size={10} />
+                    EXPAND
+                  </button>
+                </div>
+              </div>
+
+              <div className="w-full aspect-video rounded-xl overflow-hidden relative border border-white/10 shadow-2xl bg-black">
+                <video
+                  src="/spill_trace_ai_video.mp4"
+                  controls
+                  playsInline
+                  preload="metadata"
+                  className="w-full h-full object-contain"
+                />
+              </div>
+
+              <div className="flex items-center justify-between gap-2 text-[11px] font-mono text-gray-300 mt-3 pt-2.5 border-t border-white/10">
+                <span className="text-gray-400">Maritime Intelligence System Video</span>
+                <button
+                  onClick={openIntroVideo}
+                  className="text-[#00F0FF] hover:text-[#90E0EF] font-bold flex items-center gap-1 cursor-pointer transition-colors"
+                >
+                  <Play size={11} className="fill-[#00F0FF]" />
+                  Open Video Lightbox
+                </button>
+              </div>
             </div>
 
             {/* Trust Metrics */}
